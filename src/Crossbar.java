@@ -1,12 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This implements the Crossbar switching fabric
  */
 
-/**
- *
- * @author 080278
- */
+import java.util.*;
+
 public class Crossbar extends SwitchingFabric{
     
+    
+    //constructor
+    public Crossbar(int speed, Queue []inputBuffers, Queue []outputBuffers)
+    {
+        //passes the constructor values to the base class SwitchingFabric
+        super(speed, inputBuffers, outputBuffers, outputBuffers.length);
+    }
+    
+    //moves a packet from input buffer to output buffer
+    public void MovePacket(int inputBufferNumber, int outputBufferNumber)
+    {
+        
+    }
 }
