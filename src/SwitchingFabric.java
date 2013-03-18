@@ -47,20 +47,20 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     //set the Active status of the bus
-    public boolean SetBusActiveStatus(int busNumber)
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber)
     {
         //ensure valid busNumber chosen
         if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0))
         {
             //check if bus free, or already used by a buffer
             if ((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == busNumber))
+                (currentInputBufferUsingTheBus == inputBufferNumber))
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = true;
 
                 //keep track of the buffer using the bus
-                currentInputBufferUsingTheBus = busNumber;
+                currentInputBufferUsingTheBus = inputBufferNumber;
                 //successfully controlled the bus
                 return true;
             }
@@ -70,14 +70,14 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     //set the InActive status of the bus
-    public boolean SetBusInActiveStatus(int busNumber)
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber)
     {
         //ensure valid busNumber chosen
         if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0))
         {
             //check if bus free, or already used by a buffer
             if ((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == busNumber))
+                (currentInputBufferUsingTheBus == inputBufferNumber))
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;

@@ -29,11 +29,11 @@ public class Bus extends SwitchingFabric{
         //ONLY ONE BUS PRESENT IN THIS FABRIC
         //if set active status was successful and the flag is true for having
         //control of the bus
-        if((SetBusActiveStatus(0) == true) &&
+        if((SetBusActiveStatus(0, inputBufferNumber) == true) &&
            (GetBusActiveStatus(0)== true))
         {
-            //move the data to the output buffer
             
+            //move the data to the output buffer
             this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
         };
     }
@@ -89,8 +89,9 @@ public class Bus extends SwitchingFabric{
         }
         Bus tst = new Bus(75,input,output);
         tst.MovePacket(0, 2);
-        tst.SetBusInActiveStatus(0);
+        tst.SetBusInActiveStatus(0,0);
         tst.MovePacket(1, 2);
+        tst.SetBusInActiveStatus(0,1);
         tst.MovePacket(0, 2);
     }
     
