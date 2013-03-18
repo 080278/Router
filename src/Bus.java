@@ -9,7 +9,7 @@ import java.net.*;
 public class Bus extends SwitchingFabric{
     
 //*****************     T E S T I N G   **********************
-    
+   
 //***************************************    
     
     
@@ -33,8 +33,14 @@ public class Bus extends SwitchingFabric{
            (GetBusActiveStatus(0)== true))
         {
             //move the data to the output buffer
+            
             this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
         };
+    }
+    
+    public void Demo()
+    {
+        System.out.println("demo");
     }
     
     public static void main(String []args)
