@@ -22,7 +22,7 @@ public class Bus extends SwitchingFabric{
     public void MovePacket(int inputBufferNumber, int outputBufferNumber)
     {
         //ONLY ONE BUS PRESENT IN THIS FABRIC
-        //if set active status was successful and the flag is true for having
+        //if Active status was successful and the flag is true for having
         //control of the bus
         if((SetBusActiveStatus(0, inputBufferNumber) == true) &&
            (GetBusActiveStatus(0)== true))
