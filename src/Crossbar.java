@@ -5,8 +5,7 @@
 import java.util.*;
 
 public class Crossbar extends SwitchingFabric{
-    
-    
+        
     //constructor
     public Crossbar(int speed, Queue []inputBuffers, Queue []outputBuffers)
     {
