@@ -7,17 +7,17 @@ import java.util.*;
 
 public abstract class SwitchingFabric implements InterfaceFabric{
     //set th number of vertical buses
-    public final int VERTICALBUSES;
+    private final int VERTICALBUSES;
     //holds the vertical bus active flag
-    boolean []busActiveStatus;
+    private boolean []busActiveStatus;
     //holds the speed that the fabric is operating at
-    int speed;
+    private int speed;
     //holds the list of input buffers
-    Queue []inputBuffers;
+    protected Queue []inputBuffers;
     //holds the list of output buffers
-    Queue []outputBuffers;
+    protected Queue []outputBuffers;
     //holds the current input buffer using the bus
-    int currentInputBufferUsingTheBus;
+    private int currentInputBufferUsingTheBus;
     
     //moves a packet from input buffer to output buffer
     public abstract void MovePacket(int inputBufferNumber, int outputBufferNumber);

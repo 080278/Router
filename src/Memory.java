@@ -7,7 +7,7 @@ import java.util.*;
 public class Memory extends SwitchingFabric{
     
     //define the number of busses
-    public static final int VERTICALBUSES = 1;
+    private static final int VERTICALBUSES = 1;
     
     
     //constructor

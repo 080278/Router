@@ -1,19 +1,60 @@
-
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This class is the main simulator class
  */
 
-/**
- *
- * @author 080278
- */
+import java.util.*;
+import java.net.*;
+
 public class Router {
 
-    /**
-     * @param args the command line arguments
-     */
+    //holds the input buffer(s) queue
+    private Queue<DatagramPacket> []inputBuffer;
+    //holds the output buffer(s) queue
+    private Queue<DatagramPacket> []outputBuffer;
+    //holds the number of input buffers
+    
+    //holds the number of output buffers
+    
+    
+    //constructor
+    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS)
+    {
+        //initialize the input buffers
+        inputBuffer = new LinkedList[INPUTBUFFERS];
+        //initialize the output buffers
+        outputBuffer = new LinkedList[OUTPUTBUFFERS];
+        
+        //interate all buffers
+        for(int x=0; x<INPUTBUFFERS; x++)
+        {
+            //initialize each input buffer
+            inputBuffer[x] = new LinkedList();
+        }
+        
+        //interate all buffers
+        for(int x=0; x<OUTPUTBUFFERS; x++)
+        {
+            //initialize each output buffer
+            outputBuffer[x] = new LinkedList();
+        }
+        
+    }
+    
+    public void RunSimulator()
+    {
+        
+    }
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+//*********************************************************        
+        int inputBuffers = 4;
+        int outputBuffers =4;
+//*********************************************************
+        
+        
+        //initialize the simulator
+        Router sim = new Router(inputBuffers,outputBuffers);
+        //run the simulator
+        sim.RunSimulator();
     }
 }
