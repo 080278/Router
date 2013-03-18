@@ -8,11 +8,6 @@ import java.net.*;
 
 public class Bus extends SwitchingFabric{
     
-//*****************     T E S T I N G   **********************
-   
-//***************************************    
-    
-    
     //define the number of busses
     public static final int VERTICALBUSES = 1;
     
@@ -35,14 +30,10 @@ public class Bus extends SwitchingFabric{
             
             //move the data to the output buffer
             this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
-        };
+        }
     }
     
-    public void Demo()
-    {
-        System.out.println("demo");
-    }
-    
+        
     public static void main(String []args)
     {
         Queue<DatagramPacket> []input= new LinkedList[4];
