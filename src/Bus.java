@@ -19,7 +19,7 @@ public class Bus extends SwitchingFabric{
     }
     
     //moves a packet from input buffer to output buffer
-    public void MovePacket(int inputBufferNumber, int outputBufferNumber)
+    public int MovePacket(int inputBufferNumber, int outputBufferNumber)
     {
         //ONLY ONE BUS PRESENT IN THIS FABRIC
         //if Active status was successful and the flag is true for having
@@ -31,6 +31,9 @@ public class Bus extends SwitchingFabric{
             //move the data to the output buffer
             this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
         }
+        
+        //tell the bus used to send the packet
+        return 0;
     }
     
         

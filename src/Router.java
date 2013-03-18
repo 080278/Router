@@ -53,6 +53,13 @@ public class Router {
         RunSimulator();
     }
 
+    //adds a packet to the input buffer indicated
+    private void AddInputPacket(DatagramPacket dPacket, int bufferNumber)
+    {
+        //put a packet in the chosen buffer
+        inputBuffer[bufferNumber].add(dPacket);
+    }
+    
     /*
      * loads the configuration file and configures the 
      * simulation
@@ -62,43 +69,19 @@ public class Router {
 //**********************    T E S T I N G   ****************        
         int speed = 25;
         
-        Queue<DatagramPacket> []input= new LinkedList[4];
-        Queue<DatagramPacket> []output= new LinkedList[4];
-        
-        for (int x=0;x<input.length;x++)
-            input[x] = new LinkedList();
-        for (int x=0;x<output.length;x++)
-            output[x] = new LinkedList();
-        
         byte[] buf = new byte[256];
         String s= "Testing 1,2,3....";
         buf = s.getBytes();
         
         try
         {
-            DatagramPacket pck = new DatagramPacket(buf,buf.length,InetAddress.getByName("localhost"),9999);
 
-
-            input[0].add(pck);
-            input[0].add(pck);
-            input[0].add(pck);
-            input[0].add(pck);
-
-            input[1].add(pck);
-            input[1].add(pck);
-            input[1].add(pck);
-            input[1].add(pck);
-
-            input[2].add(pck);
-            input[2].add(pck);
-            input[2].add(pck);
-            input[2].add(pck);
-
-            input[3].add(pck);
-            input[3].add(pck);
-            input[3].add(pck);
-            input[3].add(pck);
-
+            for(int y=0; y<4; y++)
+                for(int x=0; x<4; x++)
+                {
+                    DatagramPacket pck = new DatagramPacket(buf,buf.length,InetAddress.getByName("localhost"),9999);
+                    AddInputPacket(pck,y);
+                }
         }
         catch(Exception e)
         {
@@ -106,25 +89,41 @@ public class Router {
         }
 //**********************************************************        
         
-        //set the fabric type
-        this.sFabric = new Bus(25,input,output);
+        //create the fabric type, and pass input & output buffer 
+        this.sFabric = new Bus(25,inputBuffer,outputBuffer);
     }
     
     public void RunSimulator()
     {
+        //number of attempts to move packets
+        int iterations =10;
+        //bus used to move the packet
+        int busUsed;
         
+        //generate random number
+        Random st = new Random();
+        
+        for(int x=0;x < iterations; x++)
+        {
+            int from = st.nextInt(INPUTBUFFERS);
+            int to = st.nextInt(INPUTBUFFERS);
+            
+            //randomly move packets
+            busUsed = sFabric.MovePacket(from,to);
+            //release the Bus used to send packet
+            sFabric.SetBusInActiveStatus(busUsed, from);
+        }
     }
     
     public static void main(String[] args) {
-//*********************************************************        
+//**************     T E S T I N G  ***********************        
         int inputBuffers = 4;
         int outputBuffers =4;
 //*********************************************************
         
         
-        //initialize the simulator
+        //Begin the simulation
         Router sim = new Router(inputBuffers,outputBuffers);
-        //run the simulator
-        sim.RunSimulator();
+        
     }
 }

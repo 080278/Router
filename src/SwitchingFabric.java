@@ -20,7 +20,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     protected int currentInputBufferUsingTheBus;
     
     //moves a packet from input buffer to output buffer
-    public abstract void MovePacket(int inputBufferNumber, int outputBufferNumber);
+    public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber);
     
     //constructor
     public SwitchingFabric(int speed, Queue []inputBuffers, Queue []outputBuffers, int VERTICALBUSES)
@@ -98,5 +98,11 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     {
         //get the status of the bus
         return busActiveStatus[busNumber];
+    }
+    
+    //get which buffer using the Bus
+    public int GetCurrentInputBufferUsingTheBus()
+    {
+        return currentInputBufferUsingTheBus;
     }
 }

@@ -18,9 +18,18 @@ public class Memory extends SwitchingFabric{
     }
     
     //moves a packet from input buffer to output buffer
-    public void MovePacket(int inputBufferNumber, int outputBufferNumber)
+    public int MovePacket(int inputBufferNumber, int outputBufferNumber)
     {
-        
+        return -999999;
     }
-    
+    //attempt to Takes control of the Fabric Bus
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber)
+    {
+        return false;
+    }
+    //attempt to Release control of the Fabric Bus
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber)
+    {
+        return false;
+    }
 }
