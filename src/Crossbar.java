@@ -15,7 +15,7 @@ public class Crossbar extends SwitchingFabric{
     
 
     //moves a packet from input buffer to output buffer
-    public int MovePacket(int inputBufferNumber, int outputBufferNumber)
+    public int MovePacket(int inputBufferNumber, int outputBufferNumber,int TIME)
     {
         return -999999;
     }

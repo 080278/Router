@@ -20,7 +20,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     protected int currentInputBufferUsingTheBus;
     
     //moves a packet from input buffer to output buffer
-    public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber);
+    public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME);
     
     //constructor
     public SwitchingFabric(int speed, Queue []inputBuffers, Queue []outputBuffers, int VERTICALBUSES)
@@ -105,4 +105,11 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     {
         return currentInputBufferUsingTheBus;
     }
+    
+    //get the speed of the fabric
+    public int GetSpeed()
+    {
+        return speed;
+    }
+    
 }

@@ -7,10 +7,15 @@ import java.net.*;
 
 public class Router {
 
+    //holds the clock time
+    int TIME;
+    //holds the ready queue
+    private PriorityQueue<Event> readyQueue;
+    
     //holds the input buffer(s) queue
-    private Queue<DatagramPacket> []inputBuffer;
+    private Queue<RouterPacket> []inputBuffer;
     //holds the output buffer(s) queue
-    private Queue<DatagramPacket> []outputBuffer;
+    private Queue<RouterPacket> []outputBuffer;
     //holds the number of input buffers
     private final int INPUTBUFFERS;
     //holds the number of output buffers
@@ -22,7 +27,10 @@ public class Router {
     //constructor
     public Router(int INPUTBUFFERS, int OUTPUTBUFFERS)
     {
-        
+        //set the clock time
+        TIME = 0;
+        //initialize the priority ready queue
+        readyQueue = new PriorityQueue<Event>();
         //save the number of input buffers
         this.INPUTBUFFERS = INPUTBUFFERS;
         //save the number of output buffers
@@ -54,7 +62,7 @@ public class Router {
     }
 
     //adds a packet to the input buffer indicated
-    private void AddInputPacket(DatagramPacket dPacket, int bufferNumber)
+    private void AddInputPacket(RouterPacket dPacket, int bufferNumber)
     {
         //put a packet in the chosen buffer
         inputBuffer[bufferNumber].add(dPacket);
@@ -67,7 +75,7 @@ public class Router {
     private void CofigureSimulator()
     {
 //**********************    T E S T I N G   ****************        
-        int speed = 25;
+        int fabricSpeed = 5;
         
         byte[] buf = new byte[256];
         String s= "Testing 1,2,3....";
@@ -79,7 +87,8 @@ public class Router {
             for(int y=0; y<INPUTBUFFERS; y++)
                 for(int x=0; x<4; x++)
                 {
-                    DatagramPacket pck = new DatagramPacket(buf,buf.length,InetAddress.getByName("localhost"),9999);
+                    RouterPacket pck = new RouterPacket(buf,buf.length,InetAddress.getByName("localhost"),9999,
+                                                        TIME);
                     AddInputPacket(pck,y);
                 }
         }
@@ -90,41 +99,69 @@ public class Router {
 //**********************************************************        
         
         //create the fabric type, and pass input & output buffer 
-        this.sFabric = new Bus(25,inputBuffer,outputBuffer);
+        this.sFabric = new Bus(fabricSpeed,inputBuffer,outputBuffer);
     }
     
     public void RunSimulator()
     {
+//**************************************************************         
         //number of attempts to move packets
-        int iterations =10;
+        //int iterations =10;
         //bus used to move the packet
         int busUsed;
         
+       
         //generate random number
         Random st = new Random();
+//**************************************************************   
+        //holds the current event
+        Event current;
         
-        for(int x=0;x < iterations; x++)
+        //add fabric switching events to the simulator
+        readyQueue.add(new Event(TIME + sFabric.GetSpeed(), "FabricSwitching"));
+        
+        //begin the simulation
+        while(readyQueue.size() != 0)
         {
-            int from = st.nextInt(INPUTBUFFERS);
-            int to = st.nextInt(OUTPUTBUFFERS);
+            //get the next event from the queue
+            current = readyQueue.poll();
+            //update the simulator time
+            TIME = current.GetTicks();
+            
+            //checkevent for fabric switching
+            if (current.GetActionToBeTaken().compareToIgnoreCase("FabricSwitching") == 0)
+            {
+                //update the next fabric switch time
+                current.SetTicks(current.GetTicks()+sFabric.GetSpeed());
+                //put the updated fabric switch time back in the event queue
+                readyQueue.add(current);
+                
+//*******************************************************************
+//NEED TO USE THE APPROPIATE Random Distribution
+                int from = st.nextInt(INPUTBUFFERS);
+                int to = st.nextInt(OUTPUTBUFFERS);
             
 //*******************************************************************
 System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size());
 //*******************************************************************            
-            //randomly move packets
-            busUsed = sFabric.MovePacket(from,to);
-            //release the Bus used to send packet
-            sFabric.SetBusInActiveStatus(busUsed, from);
+                //randomly move packets
+                busUsed = sFabric.MovePacket(from,to, TIME);
+                //release the Bus used to send packet
+                sFabric.SetBusInActiveStatus(busUsed, from);
 //*******************************************************************
 System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size()+"\n");
-//*******************************************************************            
+//******************************************************************* 
+            }
+            
             
         }
+        
+        
     }
     
     public static void main(String[] args) {
 //**************     T E S T I N G  ***********************        
-        int inputBuffers = 2;
+        int inputBuffers = 4;
         int outputBuffers =4;
 //*********************************************************
         

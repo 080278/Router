@@ -19,7 +19,7 @@ public class Bus extends SwitchingFabric{
     }
     
     //moves a packet from input buffer to output buffer
-    public int MovePacket(int inputBufferNumber, int outputBufferNumber)
+    public int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME)
     {
         //ONLY ONE BUS PRESENT IN THIS FABRIC
         //if Active status was successful and the flag is true for having
@@ -30,8 +30,14 @@ public class Bus extends SwitchingFabric{
             //ensure there is packet in the buffer
             if(inputBuffers[inputBufferNumber].size() > 0)
             {
+                //get RouterPacket from input buffer
+                RouterPacket rPacket = (RouterPacket)inputBuffers[inputBufferNumber].remove();
+                
+                //update the time delivered
+                rPacket.SetTimeDelivered(TIME);
+                
                 //move the data to the output buffer
-                this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
+                this.outputBuffers[outputBufferNumber].add(rPacket);
             }
         }
         
@@ -85,11 +91,11 @@ public class Bus extends SwitchingFabric{
             System.out.println("Error");
         }
         Bus tst = new Bus(75,input,output);
-        tst.MovePacket(0, 2);
+        tst.MovePacket(0, 2,999);
         tst.SetBusInActiveStatus(0,0);
-        tst.MovePacket(1, 2);
+        tst.MovePacket(1, 2,999);
         tst.SetBusInActiveStatus(0,1);
-        tst.MovePacket(0, 2);
+        tst.MovePacket(0, 2,999);
     }
     
 }
