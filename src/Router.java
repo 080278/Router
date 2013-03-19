@@ -76,7 +76,7 @@ public class Router {
         try
         {
 
-            for(int y=0; y<4; y++)
+            for(int y=0; y<INPUTBUFFERS; y++)
                 for(int x=0; x<4; x++)
                 {
                     DatagramPacket pck = new DatagramPacket(buf,buf.length,InetAddress.getByName("localhost"),9999);
@@ -106,18 +106,25 @@ public class Router {
         for(int x=0;x < iterations; x++)
         {
             int from = st.nextInt(INPUTBUFFERS);
-            int to = st.nextInt(INPUTBUFFERS);
+            int to = st.nextInt(OUTPUTBUFFERS);
             
+//*******************************************************************
+System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size());
+//*******************************************************************            
             //randomly move packets
             busUsed = sFabric.MovePacket(from,to);
             //release the Bus used to send packet
             sFabric.SetBusInActiveStatus(busUsed, from);
+//*******************************************************************
+System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size()+"\n");
+//*******************************************************************            
+            
         }
     }
     
     public static void main(String[] args) {
 //**************     T E S T I N G  ***********************        
-        int inputBuffers = 4;
+        int inputBuffers = 2;
         int outputBuffers =4;
 //*********************************************************
         

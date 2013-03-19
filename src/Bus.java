@@ -27,9 +27,12 @@ public class Bus extends SwitchingFabric{
         if((SetBusActiveStatus(0, inputBufferNumber) == true) &&
            (GetBusActiveStatus(0)== true))
         {
-            
-            //move the data to the output buffer
-            this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
+            //ensure there is packet in the buffer
+            if(inputBuffers[inputBufferNumber].size() > 0)
+            {
+                //move the data to the output buffer
+                this.outputBuffers[outputBufferNumber].add(inputBuffers[inputBufferNumber].remove());
+            }
         }
         
         //tell the bus used to send the packet
