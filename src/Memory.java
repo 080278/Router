@@ -23,13 +23,25 @@ public class Memory extends SwitchingFabric{
         return -999999;
     }
     //attempt to Takes control of the Fabric Bus
-    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber)
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
     {
         return false;
     }
     //attempt to Release control of the Fabric Bus
-    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber)
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
     {
         return false;
+    }
+    
+    //get the recent packet moved
+    public RouterPacket GetRecentPacket()
+    {
+        return null;
+    }
+    
+    //get the recent packet moved
+    public int GetRecentBus()
+    {
+        return 0;
     }
 }

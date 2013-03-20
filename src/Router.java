@@ -9,6 +9,9 @@ public class Router {
 
     //holds the clock time
     int TIME;
+    //holds the tick interval an attempt to move a packet occurs
+    int PULSE;
+    
     //holds the ready queue
     private PriorityQueue<Event> readyQueue;
     
@@ -22,13 +25,19 @@ public class Router {
     private final int OUTPUTBUFFERS;
     //holds the switching fabric
     private SwitchingFabric sFabric;
+    //holds the currently selected input buffer
+    int FROM;
+    //holds the currently selected output buffer
+    int TO;
     
     
     //constructor
-    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS)
+    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse)
     {
         //set the clock time
         TIME = 0;
+        //set the pulse of the router
+        PULSE = pulse;
         //initialize the priority ready queue
         readyQueue = new PriorityQueue<Event>();
         //save the number of input buffers
@@ -74,7 +83,8 @@ public class Router {
      */
     private void CofigureSimulator()
     {
-//**********************    T E S T I N G   ****************        
+//**********************    T E S T I N G   ****************  
+        
         int fabricSpeed = 5;
         int sequence = 1; //holds the packet number
          byte[] buf = new byte[256];
@@ -109,6 +119,7 @@ public class Router {
 //**************************************************************         
         //number of attempts to move packets
         //int iterations =10;
+        
         //bus used to move the packet
         int busUsed;
         
@@ -119,8 +130,10 @@ public class Router {
         //holds the current event
         Event current;
         
-        //add fabric switching events to the simulator
-        readyQueue.add(new Event(TIME + sFabric.GetSpeed(), "FabricSwitching"));
+        //add Capture Available Bus events to the simulator
+        readyQueue.add(new Event(TIME + PULSE, "CaptureBus"));
+        
+        
         
         //begin the simulation
         while(readyQueue.size() != 0)
@@ -130,31 +143,71 @@ public class Router {
             //update the simulator time
             TIME = current.GetTicks();
             
-            //checkevent for fabric switching
-            if (current.GetActionToBeTaken().compareToIgnoreCase("FabricSwitching") == 0)
+            //checkevent for Capture Available Bus
+            if (current.GetActionToBeTaken().compareToIgnoreCase("CaptureBus") == 0)
             {
+                //update the next Capture Available Bus events time
+                current.SetTicks(current.GetTicks()+PULSE);
+                //put the updated Capture Available Bus back in the event queue
+                readyQueue.add(current);
+                
+                //holds peek at the RouterPacket sequence number
+                RouterPacket peekPacket; 
+                
+//*******************************************************************
+//NEED TO USE THE APPROPIATE Random Distribution
+                
+                //ensure there's packet(s) in the selected input buffer, to be switched
+                while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
+                {
+                    //get another buffer
+                    FROM = st.nextInt(INPUTBUFFERS);
+                }
+                TO = st.nextInt(OUTPUTBUFFERS);
+            
+//*******************************************************************                
+                
+                //attempt to capture a free bus in the fabric
+                /*
+                 * Memory Fabric -  Maximum 1 bus = bus 0
+                 * Bus Fabric - Maximum 1 bus = bus 0
+                 * Crossbar Fabric - Maximum 1 INFINITY(max integer)
+                 */ 
+System.out.println("Time: "+TIME+"   Attempting to capture a Bus -> ");                
+                if(sFabric.SetBusActiveStatus(0,FROM,peekPacket.GetSequenceNumber()) == true)
+                {
+System.out.println("    Got Bus: "+sFabric.GetRecentBus()+"    for Packet#: "+sFabric.sequence);                    
+                    //add fabric switching events to the simulator
+                    readyQueue.add(new Event(TIME + sFabric.GetSpeed(), "FabricSwitching"));
+                }
+            }
+            
+            //checkevent for fabric switching
+            else if (current.GetActionToBeTaken().compareToIgnoreCase("FabricSwitching") == 0)
+            {
+                /*
                 //update the next fabric switch time
                 current.SetTicks(current.GetTicks()+sFabric.GetSpeed());
                 //put the updated fabric switch time back in the event queue
                 readyQueue.add(current);
-                
-//*******************************************************************
-//NEED TO USE THE APPROPIATE Random Distribution
-                int from = st.nextInt(INPUTBUFFERS);
-                int to = st.nextInt(OUTPUTBUFFERS);
-            
-//*******************************************************************
-System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size());
+                */
+
+System.out.println("Input["+FROM+"]" +" = "+inputBuffer[FROM].size()+"    --> Output["+TO+"]" + " = "+ outputBuffer[TO].size());
 //*******************************************************************            
                 //randomly move packets
-                busUsed = sFabric.MovePacket(from,to, TIME);
+                busUsed = sFabric.MovePacket(FROM,TO, TIME);
                 
 //*******************************************************************
-System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size()+"    Packet :- "+sFabric.GetCurrentPacketUsingTheBus()+"\n");
+System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
+        inputBuffer[FROM].size()+"    --> Output["+TO+"]" + " = "+ 
+        outputBuffer[TO].size()+"    <- Packet : "+
+        sFabric.GetCurrentPacketUsingTheBus()+
+        "   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
+        "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+" ->\n");
 //******************************************************************* 
 
                 //release the Bus used to send packet
-                sFabric.SetBusInActiveStatus(busUsed, from,sFabric.GetCurrentPacketUsingTheBus());
+                sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
             }
             
             
@@ -167,10 +220,11 @@ System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Ou
 //**************     T E S T I N G  ***********************        
         int inputBuffers = 4;
         int outputBuffers =4;
+        int pulse = 2; //every two ticks the router attempt to move a packet
 //*********************************************************
         
         //Begin the simulation
-        Router sim = new Router(inputBuffers,outputBuffers);
+        Router sim = new Router(inputBuffers,outputBuffers, pulse);
         
     }
 }

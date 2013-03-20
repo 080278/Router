@@ -27,6 +27,14 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     
     //moves a packet from input buffer to output buffer
     public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME);
+    //attempt to Takes control of the Fabric Bus
+    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence);
+    //attempt to Release control of the Fabric Bus
+    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence);
+    //get the recent packet moved
+    public abstract RouterPacket GetRecentPacket();
+    //get the recent bus used moved
+    public abstract int GetRecentBus();
     
     //constructor
     public SwitchingFabric(int speed, Queue []inputBuffers, Queue []outputBuffers, int VERTICALBUSES)
@@ -44,6 +52,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         //set the current input buffer occupying the fabric bus, -1 = none
         currentInputBufferUsingTheBus = -1;
         
+        
         //initialize each vertical bus to available
         for(int x=0;x< this.VERTICALBUSES;x++)
         {
@@ -52,60 +61,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         }
     }
     
-    //set the Active status of the bus
-    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
-    {
-        //ensure valid busNumber chosen
-        if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0))
-        {
-            //check if bus free, or already used by a buffer
-            if ((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == inputBufferNumber)) 
-            {
-                //set the status of the bus
-                busActiveStatus[busNumber] = true;
-
-                //keep track of the buffer using the bus
-                currentInputBufferUsingTheBus = inputBufferNumber;
-                
-                //keep track of the packet sequence using the bus
-                sequence = packetSequence;
-                
-                //successfully controlled the bus
-                return true;
-            }
-        }
-        //was unable to control the bus
-        return false;
-    }
     
-    //set the InActive status of the bus
-    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
-    {
-        //ensure valid busNumber chosen
-        if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0))
-        {
-            //check if bus free, or already used by a buffer
-            if (((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == inputBufferNumber)) &&
-                (sequence == packetSequence))
-            {
-                //set the status of the bus
-                busActiveStatus[busNumber] = false;
-                
-                //no buffer using the bus
-                currentInputBufferUsingTheBus = -1;
-                
-                //no packet using the bus
-                sequence = -1;
-                
-                //successfully released the bus
-                return true;
-            }
-        }
-        //was unable to control the bus
-        return false;
-    }
 
     
     //get the active status of the bus

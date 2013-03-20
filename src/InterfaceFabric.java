@@ -9,4 +9,8 @@ public interface InterfaceFabric {
     public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence);
     //attempt to Release control of the Fabric Bus
     public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence);
-}
+    //get the recent packet moved
+    public abstract RouterPacket GetRecentPacket();
+    //get the recent bus used
+    public abstract int GetRecentBus();
+}   

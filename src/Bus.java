@@ -10,6 +10,10 @@ public class Bus extends SwitchingFabric{
     
     //define the number of busses
     private static final int VERTICALBUSES = 1;
+    //holds the last packet moved
+    RouterPacket recentPacket;
+    //holds the last bus captured
+    int recentBus;
     
     //constructor
     public Bus(int speed, Queue []inputBuffers, Queue []outputBuffers)
@@ -29,8 +33,7 @@ public class Bus extends SwitchingFabric{
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
         
         //esure there is a packet to move, packet activate bus successfully,bus becomes active 
-        if((peekPacket != null) && (SetBusActiveStatus(0, inputBufferNumber,peekPacket.GetSequenceNumber()) == true) &&
-           (GetBusActiveStatus(0)== true))
+        if((peekPacket != null) && (sequence == peekPacket.GetSequenceNumber()) && (GetBusActiveStatus(0)== true))
         {
             //ensure there is packet in the buffer
             if(inputBuffers[inputBufferNumber].size() > 0)
@@ -41,8 +44,16 @@ public class Bus extends SwitchingFabric{
                 //update the time delivered
                 rPacket.SetTimeDelivered(TIME);
                 
+                //set the recent packet moved
+                recentPacket = rPacket;
+                
+                //set the recent bus used
+                recentBus = 0;
+                
                 //move the data to the output buffer
                 this.outputBuffers[outputBufferNumber].add(rPacket);
+                
+                
             }
         }
         
@@ -50,6 +61,83 @@ public class Bus extends SwitchingFabric{
         return 0;
     }
     
+    //set the Active status of the bus
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
+    {
+        //REMOVE IN CROSSBAR FABRIC TYPE
+        //only one bus present in this fabric type, 
+        busNumber = 0;
+        
+        //ensure valid busNumber chosen
+        if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0) &&
+            (busActiveStatus[busNumber] == false))
+        {
+            //check if bus free, or already used by a buffer
+            if ((currentInputBufferUsingTheBus == -1) ||
+                (currentInputBufferUsingTheBus == inputBufferNumber)) 
+            {
+                //set the status of the bus
+                busActiveStatus[busNumber] = true;
+
+                //keep track of the buffer using the bus
+                currentInputBufferUsingTheBus = inputBufferNumber;
+                
+                //keep track of the packet sequence using the bus
+                sequence = packetSequence;
+                
+                //successfully controlled the bus
+                return true;
+            }
+        }
+        //was unable to control the bus
+        return false;
+    }
+    
+    //set the InActive status of the bus
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
+    {
+                
+        //REMOVE IN CROSSBAR FABRIC TYPE
+        //only one bus present in this fabric type, 
+        busNumber = 0;
+        
+        //ensure valid busNumber chosen
+        if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0) &&
+            (busActiveStatus[busNumber] == true))
+        {
+            //check if bus free, or already used by a buffer
+            if (((currentInputBufferUsingTheBus == -1) ||
+                (currentInputBufferUsingTheBus == inputBufferNumber)) &&
+                (sequence == packetSequence))
+            {
+                //set the status of the bus
+                busActiveStatus[busNumber] = false;
+                
+                //no buffer using the bus
+                currentInputBufferUsingTheBus = -1;
+                
+                //no packet using the bus
+                sequence = -1;
+                
+                //successfully released the bus
+                return true;
+            }
+        }
+        //was unable to control the bus
+        return false;
+    }
+    
+    //get the recent packet moved
+    public RouterPacket GetRecentPacket()
+    {
+        return recentPacket;
+    }
+    
+    //get the recent bus captured
+    public int GetRecentBus()
+    {
+        return recentBus;
+    }
         
     public static void main(String []args)
     {
