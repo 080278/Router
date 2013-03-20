@@ -24,7 +24,12 @@ public class Bus extends SwitchingFabric{
         //ONLY ONE BUS PRESENT IN THIS FABRIC
         //if Active status was successful and the flag is true for having
         //control of the bus
-        if((SetBusActiveStatus(0, inputBufferNumber) == true) &&
+        
+        //peek at the RouterPacket sequence number
+        RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
+        
+        //esure there is a packet to move, packet activate bus successfully,bus becomes active 
+        if((peekPacket != null) && (SetBusActiveStatus(0, inputBufferNumber,peekPacket.GetSequenceNumber()) == true) &&
            (GetBusActiveStatus(0)== true))
         {
             //ensure there is packet in the buffer
@@ -92,9 +97,9 @@ public class Bus extends SwitchingFabric{
         }
         Bus tst = new Bus(75,input,output);
         tst.MovePacket(0, 2,999);
-        tst.SetBusInActiveStatus(0,0);
+        tst.SetBusInActiveStatus(0,0,0000);
         tst.MovePacket(1, 2,999);
-        tst.SetBusInActiveStatus(0,1);
+        tst.SetBusInActiveStatus(0,1,0000);
         tst.MovePacket(0, 2,999);
     }
     

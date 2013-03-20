@@ -76,8 +76,8 @@ public class Router {
     {
 //**********************    T E S T I N G   ****************        
         int fabricSpeed = 5;
-        
-        byte[] buf = new byte[256];
+        int sequence = 1; //holds the packet number
+         byte[] buf = new byte[256];
         String s= "Testing 1,2,3....";
         buf = s.getBytes();
         
@@ -88,8 +88,10 @@ public class Router {
                 for(int x=0; x<4; x++)
                 {
                     RouterPacket pck = new RouterPacket(buf,buf.length,InetAddress.getByName("localhost"),9999,
-                                                        TIME);
+                                                        TIME, sequence);
                     AddInputPacket(pck,y);
+                    //increment packet sequence
+                    sequence += 1;
                 }
         }
         catch(Exception e)
@@ -146,11 +148,13 @@ System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Ou
 //*******************************************************************            
                 //randomly move packets
                 busUsed = sFabric.MovePacket(from,to, TIME);
-                //release the Bus used to send packet
-                sFabric.SetBusInActiveStatus(busUsed, from);
+                
 //*******************************************************************
-System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size()+"\n");
+System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Output["+to+"]" + " = "+ outputBuffer[to].size()+"    Packet :- "+sFabric.GetCurrentPacketUsingTheBus()+"\n");
 //******************************************************************* 
+
+                //release the Bus used to send packet
+                sFabric.SetBusInActiveStatus(busUsed, from,sFabric.GetCurrentPacketUsingTheBus());
             }
             
             
@@ -164,7 +168,6 @@ System.out.println("Input["+from+"]" +" = "+inputBuffer[from].size()+"    --> Ou
         int inputBuffers = 4;
         int outputBuffers =4;
 //*********************************************************
-        
         
         //Begin the simulation
         Router sim = new Router(inputBuffers,outputBuffers);

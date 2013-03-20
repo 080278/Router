@@ -16,8 +16,14 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     protected Queue []inputBuffers;
     //holds the list of output buffers
     protected Queue []outputBuffers;
+//********************************************************************
+//NEED TO MODIFY FOR MULTIPLE BUSES IN THE CROSS BAR FABRIC    
+//IMPLEMENT USING ARRAY(S)    
     //holds the current input buffer using the bus
     protected int currentInputBufferUsingTheBus;
+    //holds the packet sequence number using the bus(es)
+    protected int sequence;
+//********************************************************************    
     
     //moves a packet from input buffer to output buffer
     public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME);
@@ -47,20 +53,24 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     //set the Active status of the bus
-    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber)
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
     {
         //ensure valid busNumber chosen
         if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0))
         {
             //check if bus free, or already used by a buffer
             if ((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == inputBufferNumber))
+                (currentInputBufferUsingTheBus == inputBufferNumber)) 
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = true;
 
                 //keep track of the buffer using the bus
                 currentInputBufferUsingTheBus = inputBufferNumber;
+                
+                //keep track of the packet sequence using the bus
+                sequence = packetSequence;
+                
                 //successfully controlled the bus
                 return true;
             }
@@ -70,20 +80,25 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     //set the InActive status of the bus
-    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber)
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
     {
         //ensure valid busNumber chosen
         if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0))
         {
             //check if bus free, or already used by a buffer
-            if ((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == inputBufferNumber))
+            if (((currentInputBufferUsingTheBus == -1) ||
+                (currentInputBufferUsingTheBus == inputBufferNumber)) &&
+                (sequence == packetSequence))
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;
                 
                 //no buffer using the bus
                 currentInputBufferUsingTheBus = -1;
+                
+                //no packet using the bus
+                sequence = -1;
+                
                 //successfully released the bus
                 return true;
             }
@@ -104,6 +119,12 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     public int GetCurrentInputBufferUsingTheBus()
     {
         return currentInputBufferUsingTheBus;
+    }
+    
+    //get which packet sequence using the Bus
+    public int GetCurrentPacketUsingTheBus()
+    {
+        return sequence;
     }
     
     //get the speed of the fabric
