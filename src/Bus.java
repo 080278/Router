@@ -53,7 +53,6 @@ public class Bus extends SwitchingFabric{
                 //move the data to the output buffer
                 this.outputBuffers[outputBufferNumber].add(rPacket);
                 
-                
             }
         }
         
