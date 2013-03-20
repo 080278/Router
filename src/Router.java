@@ -30,14 +30,27 @@ public class Router {
     //holds the currently selected output buffer
     int TO;
     
+    /*
+     * Configuration variables
+     */
+    //size of packet
+    int PACKETSIZE;
+    //speed of fabric
+    int FABRICSPEED;
+    //************************
+    
     
     //constructor
-    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse)
+    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed)
     {
         //set the clock time
         TIME = 0;
         //set the pulse of the router
         PULSE = pulse;
+        //set the packet size
+        PACKETSIZE = packetSize;
+        //set the speed of the fabric
+        FABRICSPEED = fabricSpeed;
         //initialize the priority ready queue
         readyQueue = new PriorityQueue<Event>();
         //save the number of input buffers
@@ -85,23 +98,16 @@ public class Router {
     {
 //**********************    T E S T I N G   ****************  
         
-        int fabricSpeed = 5;
-        int sequence = 1; //holds the packet number
-         byte[] buf = new byte[256];
-        String s= "Testing 1,2,3....";
-        buf = s.getBytes();
-        
+        PacketFactory pf = new PacketFactory();
         try
         {
 
             for(int y=0; y<INPUTBUFFERS; y++)
                 for(int x=0; x<4; x++)
                 {
-                    RouterPacket pck = new RouterPacket(buf,buf.length,InetAddress.getByName("localhost"),9999,
-                                                        TIME, sequence);
-                    AddInputPacket(pck,y);
-                    //increment packet sequence
-                    sequence += 1;
+                    
+                    AddInputPacket(pf.CreatePacket(PACKETSIZE),y);
+                    
                 }
         }
         catch(Exception e)
@@ -111,7 +117,7 @@ public class Router {
 //**********************************************************        
         
         //create the fabric type, and pass input & output buffer 
-        this.sFabric = new Bus(fabricSpeed,inputBuffer,outputBuffer);
+        this.sFabric = new Bus(FABRICSPEED,inputBuffer,outputBuffer);
     }
     
     public void RunSimulator()
@@ -209,22 +215,20 @@ System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
                 //release the Bus used to send packet
                 sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
             }
-            
-            
         }
-        
-        
     }
     
     public static void main(String[] args) {
 //**************     T E S T I N G  ***********************        
         int inputBuffers = 4;
         int outputBuffers =4;
-        int pulse = 2; //every two ticks the router attempt to move a packet
+        int pulse = 5; //every two ticks the router attempt to move a packet
+        int packetSize = 15;
+        int fabricSpeed = 2;
 //*********************************************************
         
         //Begin the simulation
-        Router sim = new Router(inputBuffers,outputBuffers, pulse);
+        Router sim = new Router(inputBuffers,outputBuffers, pulse, packetSize,fabricSpeed);
         
     }
 }
