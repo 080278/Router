@@ -1,32 +1,49 @@
 
+import java.util.*;
 import java.net.InetAddress;
 
 /*
  * This class implements the creation of packets
  */
-public class PacketFactory {
-    
+public class PacketFactory implements Runnable
+{
+    //holds a reference to the Router object
+    Router sim;
     //holds the packet sequence number
     int sequence;
-    //holds the current simulation time 
-    int TIME;
+    //holds the total number of packets to make
+    int totalNumberOfPackets; 
+    //holds the number of packets delivered
+    int packetsDelivered;
+    //holds the total number of input buffers available
+    int totalNumberOfInputBuffers;
+    //holds the size of a packet
+    int packetSize;
     
-    public PacketFactory()
+    public PacketFactory(Router sim, int totalNumberOfPackets,int packetSize, int totalNumberOfInputBuffers)
     {
+        //set reference to the running simulation
+        this.sim = sim;
         //initialize the packet sequence
         sequence = 1;
-        //initialize time
-        TIME = 0;
-    }
-    
-    //update the time of the factory
-    public void SetTime(int time)
-    {
-        TIME = time;
+        //ensure at least 1 packet is created
+        if (totalNumberOfPackets < 1)
+        {
+            //default number of packets
+            totalNumberOfPackets = 1;
+        }
+        //set the total number of packets to make
+        this.totalNumberOfPackets = totalNumberOfPackets;
+        //set packets delivered to the simulation
+        packetsDelivered = 0;
+        //set the total number of input buffers
+        this.totalNumberOfInputBuffers = totalNumberOfInputBuffers;
+        //set the size of a packet
+        this.packetSize = packetSize;
     }
     
     //make data
-    private byte[] CreateData(int packetSize)
+    private byte[] CreateData()
     {
         //create byte buffer for data
         byte[] buf = new byte[packetSize];
@@ -54,19 +71,19 @@ public class PacketFactory {
     }
     
     //create packet
-    public RouterPacket CreatePacket(int packetSize)
+    private RouterPacket CreatePacket()
     {
         //holds the packet created
         RouterPacket pck = null;
         
         //create byte buffer with data
-        byte[] buf = CreateData(packetSize);
+        byte[] buf = CreateData();
         
         try
         {
             //make the packet
             pck = new RouterPacket(buf,buf.length,InetAddress.getByName("localhost"),9999,
-                                                TIME, sequence);
+                                                sim.GetTime(), sequence);
             //increment packet sequence
             sequence += 1;
         }
@@ -79,9 +96,38 @@ public class PacketFactory {
         return pck;
     }
     
-    public static void main(String []args)
+    //deliver packet to input buffer
+    private void DeliverPacket(int rndType)
     {
-        PacketFactory t = new PacketFactory();
-        t.CreatePacket(7);
+        //input buffer number
+        int bufferNumber = 0;
+        
+        switch(rndType)
+        {
+            case 1:
+//***************************************************
+                Random rnd = new Random();
+                //input buffer number
+                bufferNumber = rnd.nextInt(this.totalNumberOfInputBuffers);
+            break;
+//***************************************************        
+        }
+        //the packet created
+        RouterPacket tmp = CreatePacket();
+        //deliver a packet to the simulation
+        sim.AddInputPacket(tmp, bufferNumber);
+
+
+
+        //increment the number of packets delivered
+        packetsDelivered += 1;
     }
+    public void run()
+    {
+        while (packetsDelivered < totalNumberOfPackets)
+        {
+            DeliverPacket(1);
+        }
+    }
+    
 }

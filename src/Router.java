@@ -11,6 +11,8 @@ public class Router {
     int TIME;
     //holds the tick interval an attempt to move a packet occurs
     int PULSE;
+    //hold pause indicator
+    boolean pause;
     
     //holds the ready queue
     private PriorityQueue<Event> readyQueue;
@@ -37,11 +39,13 @@ public class Router {
     int PACKETSIZE;
     //speed of fabric
     int FABRICSPEED;
+    //number f packet created in the simulation
+    int totalNumberOfPackets;
     //************************
     
     
     //constructor
-    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed)
+    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed, int totalNumberOfPackets)
     {
         //set the clock time
         TIME = 0;
@@ -51,6 +55,12 @@ public class Router {
         PACKETSIZE = packetSize;
         //set the speed of the fabric
         FABRICSPEED = fabricSpeed;
+        //set the total number of packets 
+        this.totalNumberOfPackets = totalNumberOfPackets;
+        //pause the packet factory
+        pause = false;
+        
+        
         //initialize the priority ready queue
         readyQueue = new PriorityQueue<Event>();
         //save the number of input buffers
@@ -83,11 +93,19 @@ public class Router {
         RunSimulator();
     }
 
+    //return simulation time
+    public int GetTime()
+    {
+        return TIME;
+    }
+           
     //adds a packet to the input buffer indicated
-    private void AddInputPacket(RouterPacket dPacket, int bufferNumber)
+    public void AddInputPacket(RouterPacket dPacket, int bufferNumber)
     {
         //put a packet in the chosen buffer
         inputBuffer[bufferNumber].add(dPacket);
+        
+System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSequenceNumber()+"   to  InputBuffer: "+bufferNumber+"   PacketTIME: "+dPacket.GetTimeCreated());
     }
     
     /*
@@ -97,8 +115,9 @@ public class Router {
     private void CofigureSimulator()
     {
 //**********************    T E S T I N G   ****************  
+/*
+        PacketFactory pf = new PacketFactory(this,totalNumberOfPackets,PACKETSIZE ,INPUTBUFFERS);
         
-        PacketFactory pf = new PacketFactory();
         try
         {
 
@@ -106,7 +125,7 @@ public class Router {
                 for(int x=0; x<4; x++)
                 {
                     
-                    AddInputPacket(pf.CreatePacket(PACKETSIZE),y);
+                    AddInputPacket(pf.CreatePacket(),y);
                     
                 }
         }
@@ -114,6 +133,7 @@ public class Router {
         {
             System.out.println("Error");
         }
+*/
 //**********************************************************        
         
         //create the fabric type, and pass input & output buffer 
@@ -136,6 +156,9 @@ public class Router {
         //holds the current event
         Event current;
         
+        //start the Packet Factory
+        new Thread(new PacketFactory(this,totalNumberOfPackets,PACKETSIZE ,INPUTBUFFERS)).start();
+        
         //add Capture Available Bus events to the simulator
         readyQueue.add(new Event(TIME + PULSE, "CaptureBus"));
         
@@ -144,6 +167,8 @@ public class Router {
         //begin the simulation
         while(readyQueue.size() != 0)
         {
+            
+            
             //get the next event from the queue
             current = readyQueue.poll();
             //update the simulator time
@@ -216,6 +241,7 @@ System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
                 sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
             }
         }
+        
     }
     
     public static void main(String[] args) {
@@ -225,10 +251,11 @@ System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
         int pulse = 5; //every two ticks the router attempt to move a packet
         int packetSize = 15;
         int fabricSpeed = 2;
+        int totalNumberOfPackets = 10000; //number of packets to make
 //*********************************************************
         
         //Begin the simulation
-        Router sim = new Router(inputBuffers,outputBuffers, pulse, packetSize,fabricSpeed);
+        Router sim = new Router(inputBuffers,outputBuffers, pulse, packetSize,fabricSpeed, totalNumberOfPackets);
         
     }
 }
