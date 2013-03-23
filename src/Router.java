@@ -143,12 +143,8 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
     public void RunSimulator()
     {
 //**************************************************************         
-        //number of attempts to move packets
-        //int iterations =10;
-        
         //bus used to move the packet
         int busUsed;
-        
        
         //generate random number
         Random st = new Random();
@@ -156,8 +152,8 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         //holds the current event
         Event current;
         
-        //start the Packet Factory
-        new Thread(new PacketFactory(this,totalNumberOfPackets,PACKETSIZE ,INPUTBUFFERS)).start();
+        //create all packets needed
+        PacketFactory pFactory = new PacketFactory(totalNumberOfPackets,PACKETSIZE, INPUTBUFFERS );
         
         //add Capture Available Bus events to the simulator
         readyQueue.add(new Event(TIME + PULSE, "CaptureBus"));
@@ -187,13 +183,25 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                 
 //*******************************************************************
 //NEED TO USE THE APPROPIATE Random Distribution
-                
+                //get another buffer
+                FROM = st.nextInt(INPUTBUFFERS);
+                    
                 //ensure there's packet(s) in the selected input buffer, to be switched
                 while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
                 {
+                    
+                    
+//*************************                    
+//NEED TO ALLOCATE PROPERLY                    
+//put more packets in the the Input Buffers                    
+pFactory.DeliverPacket(1, inputBuffer);
+//*************************
+
+
                     //get another buffer
                     FROM = st.nextInt(INPUTBUFFERS);
                 }
+                
                 TO = st.nextInt(OUTPUTBUFFERS);
             
 //*******************************************************************                
@@ -251,7 +259,7 @@ System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
         int pulse = 5; //every two ticks the router attempt to move a packet
         int packetSize = 15;
         int fabricSpeed = 2;
-        int totalNumberOfPackets = 10000; //number of packets to make
+        int totalNumberOfPackets = 1000; //number of packets to make
 //*********************************************************
         
         //Begin the simulation

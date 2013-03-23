@@ -5,25 +5,27 @@ import java.net.InetAddress;
 /*
  * This class implements the creation of packets
  */
-public class PacketFactory implements Runnable
+public class PacketFactory
 {
-    //holds a reference to the Router object
-    Router sim;
+    
     //holds the packet sequence number
     int sequence;
     //holds the total number of packets to make
     int totalNumberOfPackets; 
     //holds the number of packets delivered
     int packetsDelivered;
-    //holds the total number of input buffers available
-    int totalNumberOfInputBuffers;
     //holds the size of a packet
     int packetSize;
+    //holds the time created
+    int timeCreated;
+    //holds packet created
+    Queue packetCreated;
+    //holds the total number of input buffers
+    int totalNumberOfInputBuffers;
     
-    public PacketFactory(Router sim, int totalNumberOfPackets,int packetSize, int totalNumberOfInputBuffers)
+    public PacketFactory(int totalNumberOfPackets,int packetSize, int totalNumberOfInputBuffers)
     {
-        //set reference to the running simulation
-        this.sim = sim;
+        
         //initialize the packet sequence
         sequence = 1;
         //ensure at least 1 packet is created
@@ -36,10 +38,17 @@ public class PacketFactory implements Runnable
         this.totalNumberOfPackets = totalNumberOfPackets;
         //set packets delivered to the simulation
         packetsDelivered = 0;
-        //set the total number of input buffers
-        this.totalNumberOfInputBuffers = totalNumberOfInputBuffers;
         //set the size of a packet
         this.packetSize = packetSize;
+        //set the time created
+        this.timeCreated = 0;
+        //initialize the Packet Created buffers
+        packetCreated = new LinkedList();
+        //set the total number of input buffers
+        this.totalNumberOfInputBuffers = totalNumberOfInputBuffers;
+        
+        //create all packets needed
+        MakeAllPackets();
     }
     
     //make data
@@ -83,9 +92,11 @@ public class PacketFactory implements Runnable
         {
             //make the packet
             pck = new RouterPacket(buf,buf.length,InetAddress.getByName("localhost"),9999,
-                                                sim.GetTime(), sequence);
+                                                timeCreated, sequence);
             //increment packet sequence
             sequence += 1;
+            //increment packets created
+            this.packetsDelivered += 1;
         }
         catch(Exception e)
         {
@@ -96,8 +107,26 @@ public class PacketFactory implements Runnable
         return pck;
     }
     
-    //deliver packet to input buffer
-    private void DeliverPacket(int rndType)
+    //get packet from the packet created queue
+    public RouterPacket GetPacketCreated()
+    {
+        return (RouterPacket)packetCreated.poll();
+    }
+    
+        
+    public void MakeAllPackets()
+    {
+        while (packetsDelivered < totalNumberOfPackets)
+        {
+            
+            //add created packet to packet created queue
+            packetCreated.add(CreatePacket());
+        }
+    }
+
+//*****************************************************************************    
+    //deliver packet to simulator input buffer
+    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer)
     {
         //input buffer number
         int bufferNumber = 0;
@@ -112,22 +141,16 @@ public class PacketFactory implements Runnable
             break;
 //***************************************************        
         }
-        //the packet created
-        RouterPacket tmp = CreatePacket();
-        //deliver a packet to the simulation
-        sim.AddInputPacket(tmp, bufferNumber);
 
-
-
-        //increment the number of packets delivered
-        packetsDelivered += 1;
+//***************************************************************        
+//NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPIATELY  
+        for(int y=0;y<inputBuffer.length;y++)
+            for(int x=0;x<5;x++)
+            {
+                inputBuffer[y].add(GetPacketCreated());
+            }
+//***************************************************************        
     }
-    public void run()
-    {
-        while (packetsDelivered < totalNumberOfPackets)
-        {
-            DeliverPacket(1);
-        }
-    }
+    
     
 }
