@@ -12,6 +12,8 @@ public class PacketFactory
     int sequence;
     //holds the total number of packets to make
     int totalNumberOfPackets; 
+    //holds the number of packets created
+    int packetsCreated;
     //holds the number of packets delivered
     int packetsDelivered;
     //holds the size of a packet
@@ -36,6 +38,8 @@ public class PacketFactory
         }
         //set the total number of packets to make
         this.totalNumberOfPackets = totalNumberOfPackets;
+        //set packets created to the simulation
+        packetsCreated = 0;
         //set packets delivered to the simulation
         packetsDelivered = 0;
         //set the size of a packet
@@ -96,7 +100,7 @@ public class PacketFactory
             //increment packet sequence
             sequence += 1;
             //increment packets created
-            this.packetsDelivered += 1;
+            this.packetsCreated += 1;
         }
         catch(Exception e)
         {
@@ -116,7 +120,7 @@ public class PacketFactory
         
     public void MakeAllPackets()
     {
-        while (packetsDelivered < totalNumberOfPackets)
+        while (packetsCreated < totalNumberOfPackets)
         {
             
             //add created packet to packet created queue
@@ -126,7 +130,7 @@ public class PacketFactory
 
 //*****************************************************************************    
     //deliver packet to simulator input buffer
-    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer)
+    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer, ConfigFile cfg)
     {
         //input buffer number
         int bufferNumber = 0;
@@ -144,10 +148,24 @@ public class PacketFactory
 
 //***************************************************************        
 //NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPIATELY  
-        for(int y=0;y<inputBuffer.length;y++)
-            for(int x=0;x<5;x++)
+for(int y=0;y<inputBuffer.length;y++)
+    for(int x=0;x<1024;x++)
             {
-                inputBuffer[y].add(GetPacketCreated());
+                //size limit of the buffer
+                int limit = (Integer)cfg.GetConfig("CLASS",
+                            (String)cfg.GetConfig("INPUTBUFFERSCLASS", ("buffer"+(y+1)) ));
+                //ensure that the queue limit is obeyed
+                if(((inputBuffer[y].size() + 1) <= limit) && (packetsDelivered < totalNumberOfPackets))
+                {
+                    //put packet in the input buffer 
+                    inputBuffer[y].add(GetPacketCreated());
+                    //count number of packets delivered
+                    packetsDelivered += 1;
+                }
+                else
+                {
+                    break;
+                }
             }
 //***************************************************************        
     }

@@ -11,8 +11,7 @@ public class Router {
     int TIME;
     //holds the tick interval an attempt to move a packet occurs
     int PULSE;
-    //hold pause indicator
-    boolean pause;
+    
     
     //holds the ready queue
     private PriorityQueue<Event> readyQueue;
@@ -27,11 +26,15 @@ public class Router {
     private final int OUTPUTBUFFERS;
     //holds the switching fabric
     private SwitchingFabric sFabric;
+    //holds the name of the Fabric Type
+    private String FABRICTYPE;
     //holds the currently selected input buffer
     int FROM;
     //holds the currently selected output buffer
     int TO;
     
+    //read the configuration file
+    ConfigFile cfg;
     /*
      * Configuration variables
      */
@@ -39,34 +42,42 @@ public class Router {
     int PACKETSIZE;
     //speed of fabric
     int FABRICSPEED;
-    //number f packet created in the simulation
+    //number of packet created in the simulation
     int totalNumberOfPackets;
+    //number of packet moved by the Fabric
+    int NumberOfPacketsMoved;
     //************************
     
     
     //constructor
-    public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed, int totalNumberOfPackets)
+    //public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed, int totalNumberOfPackets)
+    public Router()
     {
+        //read the configuration file
+        cfg = new ConfigFile();
+        
         //set the clock time
         TIME = 0;
         //set the pulse of the router
-        PULSE = pulse;
+        PULSE = (Integer)cfg.GetConfig("ROUTER", "pulse");
         //set the packet size
-        PACKETSIZE = packetSize;
+        PACKETSIZE = (Integer)cfg.GetConfig("PACKET", "size");
         //set the speed of the fabric
-        FABRICSPEED = fabricSpeed;
+        FABRICSPEED = (Integer)cfg.GetConfig("FABRIC", "speed");
+        //set the speed of the fabric
+        FABRICTYPE = (String)cfg.GetConfig("FABRIC", "type");
         //set the total number of packets 
-        this.totalNumberOfPackets = totalNumberOfPackets;
-        //pause the packet factory
-        pause = false;
+        this.totalNumberOfPackets = (Integer)cfg.GetConfig("PACKET", "quantity");
+        //set the total number of packets moved by the Fabric
+        NumberOfPacketsMoved = 0;
         
         
         //initialize the priority ready queue
         readyQueue = new PriorityQueue<Event>();
         //save the number of input buffers
-        this.INPUTBUFFERS = INPUTBUFFERS;
+        this.INPUTBUFFERS = (Integer)cfg.GetConfig("BUFFERS", "input");
         //save the number of output buffers
-        this.OUTPUTBUFFERS = OUTPUTBUFFERS;
+        this.OUTPUTBUFFERS = (Integer)cfg.GetConfig("BUFFERS", "output");
         //initialize the input buffers
         inputBuffer = new LinkedList[this.INPUTBUFFERS];
         //initialize the output buffers
@@ -114,6 +125,24 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
      */
     private void CofigureSimulator()
     {
+        ConfigFile cfg = new ConfigFile();
+        
+        
+        if (FABRICTYPE.compareToIgnoreCase("Bus") == 0)
+        {
+            //create the fabric type, and pass input & output buffer 
+            this.sFabric = new Bus(FABRICSPEED,inputBuffer,outputBuffer);
+        }
+        else if (FABRICTYPE.compareToIgnoreCase("Memory") == 0)
+        {
+            //create the fabric type, and pass input & output buffer 
+            this.sFabric = new Memory(FABRICSPEED,inputBuffer,outputBuffer);
+        }
+        if (FABRICTYPE.compareToIgnoreCase("Crossbar") == 0)
+        {
+            //create the fabric type, and pass input & output buffer 
+            this.sFabric = new Crossbar(FABRICSPEED,inputBuffer,outputBuffer);
+        }
 //**********************    T E S T I N G   ****************  
 /*
         PacketFactory pf = new PacketFactory(this,totalNumberOfPackets,PACKETSIZE ,INPUTBUFFERS);
@@ -136,8 +165,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
 */
 //**********************************************************        
         
-        //create the fabric type, and pass input & output buffer 
-        this.sFabric = new Bus(FABRICSPEED,inputBuffer,outputBuffer);
+        
     }
     
     public void RunSimulator()
@@ -159,12 +187,10 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         readyQueue.add(new Event(TIME + PULSE, "CaptureBus"));
         
         
-        
         //begin the simulation
-        while(readyQueue.size() != 0)
+        while((readyQueue.size() != 0) && (NumberOfPacketsMoved < totalNumberOfPackets))
         {
-            
-            
+                        
             //get the next event from the queue
             current = readyQueue.poll();
             //update the simulator time
@@ -187,14 +213,15 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                 FROM = st.nextInt(INPUTBUFFERS);
                     
                 //ensure there's packet(s) in the selected input buffer, to be switched
-                while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
+                while(((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null) && 
+                       (NumberOfPacketsMoved < totalNumberOfPackets))
                 {
                     
                     
 //*************************                    
 //NEED TO ALLOCATE PROPERLY                    
-//put more packets in the the Input Buffers                    
-pFactory.DeliverPacket(1, inputBuffer);
+//puts 15 packets in the the Input Buffers, every time                
+pFactory.DeliverPacket(1, inputBuffer, cfg);
 //*************************
 
 
@@ -235,6 +262,8 @@ System.out.println("Input["+FROM+"]" +" = "+inputBuffer[FROM].size()+"    --> Ou
 //*******************************************************************            
                 //randomly move packets
                 busUsed = sFabric.MovePacket(FROM,TO, TIME);
+                //increment packets moved from INPUT to OUTPUT Buffer
+                NumberOfPacketsMoved += 1;
                 
 //*******************************************************************
 System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
@@ -263,7 +292,7 @@ System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
 //*********************************************************
         
         //Begin the simulation
-        Router sim = new Router(inputBuffers,outputBuffers, pulse, packetSize,fabricSpeed, totalNumberOfPackets);
+        Router sim = new Router();
         
     }
 }
