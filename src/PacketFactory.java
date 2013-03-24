@@ -151,10 +151,21 @@ public class PacketFactory
 for(int y=0;y<inputBuffer.length;y++)
     for(int x=0;x<1024;x++)
             {
-                //size limit of the buffer
-                int limit = (Integer)cfg.GetConfig("CLASS",
-                            (String)cfg.GetConfig("INPUTBUFFERSCLASS", ("buffer"+(y+1)) ));
-                //ensure that the queue limit is obeyed
+                //size limit of the Input buffer
+                int limit;
+                
+                try
+                {
+                    //get buffer size limit
+                    limit = (Integer)cfg.GetConfig("CLASS",
+                                (String)cfg.GetConfig("INPUTBUFFERSCLASS", ("buffer"+(y+1)) ));
+                }
+                catch (Exception e){
+                    //apply default limit if Class not specified for Buffer in [INPUTBUFFERSCLASS]
+                    limit = (Integer)cfg.GetConfig("CLASS",
+                                (String)cfg.GetConfig("INPUTBUFFERSCLASS", ("Default") ));
+                }
+                //ensure that the Input Buffer limit(s) are obeyed
                 if(((inputBuffer[y].size() + 1) <= limit) && (packetsDelivered < totalNumberOfPackets))
                 {
                     //put packet in the input buffer 

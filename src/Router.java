@@ -257,23 +257,50 @@ System.out.println("    Got Bus: "+sFabric.GetRecentBus()+"    for Packet#: "+sF
                 //put the updated fabric switch time back in the event queue
                 readyQueue.add(current);
                 */
+                
+                //size limit of the Input buffer
+                int limit;
+                
+                try
+                {
+                    //get buffer size limit
+                    limit = (Integer)cfg.GetConfig("CLASS",
+                                (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("buffer"+(TO+1)) ));
+                }
+                catch (Exception e){
+                    //apply default limit if Class not specified for Buffer in [INPUTBUFFERSCLASS]
+                    limit = (Integer)cfg.GetConfig("CLASS",
+                                (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("Default") ));
+                }
 
-System.out.println("Input["+FROM+"]" +" = "+inputBuffer[FROM].size()+"    --> Output["+TO+"]" + " = "+ outputBuffer[TO].size());
+                //ensure that the Output Buffer limit(s) are obeyed
+                if((outputBuffer[TO].size() + 1) <= limit)
+                {
+System.out.println("Input["+(FROM+1)+"]" +" = "+inputBuffer[FROM].size()+"    --> Output["+(TO+1)+"]" + " = "+ outputBuffer[TO].size());
 //*******************************************************************            
-                //randomly move packets
-                busUsed = sFabric.MovePacket(FROM,TO, TIME);
-                //increment packets moved from INPUT to OUTPUT Buffer
-                NumberOfPacketsMoved += 1;
+                    //randomly move packets
+                    busUsed = sFabric.MovePacket(FROM,TO, TIME);
+                    //increment packets moved from INPUT to OUTPUT Buffer
+                    NumberOfPacketsMoved += 1;
                 
 //*******************************************************************
-System.out.println("Time: "+ TIME + "   Input["+FROM+"]" +" = "+
-        inputBuffer[FROM].size()+"    --> Output["+TO+"]" + " = "+ 
+System.out.println("Time: "+ TIME + "   Input["+(FROM+1)+"]" +" = "+
+        inputBuffer[FROM].size()+"    --> Output["+(TO+1)+"]" + " = "+ 
         outputBuffer[TO].size()+"    <- Packet : "+
         sFabric.GetCurrentPacketUsingTheBus()+
         "   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
         "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+" ->\n");
 //******************************************************************* 
-
+                }
+                else
+                {
+System.out.println("Time: "+ TIME + "    --> Output["+(TO+1)+"]" + " = "+ 
+        outputBuffer[TO].size()+"    Packet(s)"+ "    Cannot deliver Packet:"+
+        sFabric.GetCurrentPacketUsingTheBus()+ "    --> Output["+(TO+1)+"]" +
+        " -> F U L L\n");                    
+                    //get the recent bus used by the fabric
+                    busUsed = sFabric.GetRecentBus();
+                }
                 //release the Bus used to send packet
                 sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
             }

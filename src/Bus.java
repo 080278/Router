@@ -20,6 +20,8 @@ public class Bus extends SwitchingFabric{
     {
         //passes the constructor values to the base class SwitchingFabric
         super(speed, inputBuffers, outputBuffers, VERTICALBUSES);
+        //set the recent bus, because it never changes for this fabric type
+        recentBus = 0;
     }
     
     //moves a packet from input buffer to output buffer
@@ -48,7 +50,7 @@ public class Bus extends SwitchingFabric{
                 recentPacket = rPacket;
                 
                 //set the recent bus used
-                recentBus = 0;
+                //recentBus = 0;
                 
                 //move the data to the output buffer
                 this.outputBuffers[outputBufferNumber].add(rPacket);
@@ -56,8 +58,8 @@ public class Bus extends SwitchingFabric{
             }
         }
         
-        //tell the bus used to send the packet
-        return 0;
+        //tell the bus used to send the packet, has only 1 bus
+        return recentBus;
     }
     
     //set the Active status of the bus
