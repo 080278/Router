@@ -31,7 +31,7 @@ public class Bus extends SwitchingFabric{
         //if Active status was successful and the flag is true for having
         //control of the bus
         
-        //peek at the RouterPacket sequence number
+        //get the RouterPacket in the InputBuffer selected
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
         
         //esure there is a packet to move, packet activate bus successfully,bus becomes active 
@@ -50,7 +50,7 @@ public class Bus extends SwitchingFabric{
                 recentPacket = rPacket;
                 
                 //set the recent bus used
-                //recentBus = 0;
+                recentBus = 0;
                 
                 //move the data to the output buffer
                 this.outputBuffers[outputBufferNumber].add(rPacket);

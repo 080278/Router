@@ -239,8 +239,12 @@ pFactory.DeliverPacket(1, inputBuffer, cfg);
                  * Bus Fabric - Maximum 1 bus = bus 0
                  * Crossbar Fabric - Maximum 1 INFINITY(max integer)
                  */ 
-System.out.println("Time: "+TIME+"   Attempting to capture a Bus -> ");                
-                if(sFabric.SetBusActiveStatus(0,FROM,peekPacket.GetSequenceNumber()) == true)
+System.out.println("Time: "+TIME+"   Attempting to capture a Bus -> ");    
+//******************************************************************************
+//CANNOT BE '0', NEED VARIABLE, PROBLEM FOR Crossbar
+//if(sFabric.SetBusActiveStatus(0,FROM,peekPacket.GetSequenceNumber()) == true)
+if(sFabric.SetBusActiveStatus(0,FROM,peekPacket.GetSequenceNumber()) == true)
+//******************************************************************************    
                 {
 System.out.println("    Got Bus: "+sFabric.GetRecentBus()+"    for Packet#: "+sFabric.sequence);                    
                     //add fabric switching events to the simulator

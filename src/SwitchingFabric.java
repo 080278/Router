@@ -62,7 +62,11 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     
-
+    //get number of vertical buses
+    public int GetVerticalBuses()
+    {
+        return VERTICALBUSES;
+    }
     
     //get the active status of the bus
     public boolean GetBusActiveStatus(int busNumber)
