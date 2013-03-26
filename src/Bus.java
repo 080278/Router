@@ -33,13 +33,15 @@ public class Bus extends SwitchingFabric{
         
         //get the RouterPacket in the InputBuffer selected
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
-        
+
         //esure there is a packet to move, packet activate bus successfully,bus becomes active 
-        if((peekPacket != null) && (sequence == peekPacket.GetSequenceNumber()) && (GetBusActiveStatus(0)== true))
+        if((peekPacket != null) && (sequence == peekPacket.GetSequenceNumber()) && 
+           (GetBusActiveStatus(0)== true))
         {
             //ensure there is packet in the buffer
             if(inputBuffers[inputBufferNumber].size() > 0)
             {
+//System.out.println("MOVEPACKET FROM: "+inputBufferNumber+" TO: "+outputBufferNumber);                                
                 //get RouterPacket from input buffer
                 RouterPacket rPacket = (RouterPacket)inputBuffers[inputBufferNumber].remove();
                 
@@ -57,7 +59,7 @@ public class Bus extends SwitchingFabric{
                 
             }
         }
-        
+
         //tell the bus used to send the packet, has only 1 bus
         return recentBus;
     }
@@ -74,22 +76,28 @@ public class Bus extends SwitchingFabric{
             (busActiveStatus[busNumber] == false))
         {
             //check if bus free, or already used by a buffer
-            if ((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == inputBufferNumber)) 
+            if ((currentInputBufferUsingTheBus[busNumber] == -1) ||
+                (currentInputBufferUsingTheBus[busNumber] == inputBufferNumber)) 
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = true;
 
                 //keep track of the buffer using the bus
-                currentInputBufferUsingTheBus = inputBufferNumber;
+                currentInputBufferUsingTheBus[busNumber] = inputBufferNumber;
                 
                 //keep track of the packet sequence using the bus
                 sequence = packetSequence;
                 
+                //set the recently used bus
+                recentBus = busNumber;
+                
+Print(true, busNumber,packetSequence,true);   
                 //successfully controlled the bus
                 return true;
             }
         }
+        
+Print(false, busNumber,packetSequence,true);   
         //was unable to control the bus
         return false;
     }
@@ -107,23 +115,26 @@ public class Bus extends SwitchingFabric{
             (busActiveStatus[busNumber] == true))
         {
             //check if bus free, or already used by a buffer
-            if (((currentInputBufferUsingTheBus == -1) ||
-                (currentInputBufferUsingTheBus == inputBufferNumber)) &&
+            if (((currentInputBufferUsingTheBus[busNumber] == -1) ||
+                (currentInputBufferUsingTheBus[busNumber] == inputBufferNumber)) &&
                 (sequence == packetSequence))
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;
                 
                 //no buffer using the bus
-                currentInputBufferUsingTheBus = -1;
+                currentInputBufferUsingTheBus[busNumber] = -1;
                 
                 //no packet using the bus
                 sequence = -1;
                 
+Print(true, busNumber,packetSequence,false); 
                 //successfully released the bus
                 return true;
             }
         }
+        
+Print(false, busNumber,packetSequence,false);  
         //was unable to control the bus
         return false;
     }
@@ -140,6 +151,24 @@ public class Bus extends SwitchingFabric{
         return recentBus;
     }
         
+    public static void Print(boolean result, int ActiveTO, int sequence, boolean active)
+    {
+        if(active)
+        {
+            if(result)        
+                System.out.println("    Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
+            else                
+                System.out.println("    Bus: "+ (ActiveTO+1) +"   [Already Active]   Packet: "+sequence);        
+        }
+        else
+        {
+            if(result)        
+                System.out.println("    Bus: "+ (ActiveTO+1) +"   Set -> INACTIVE    Packet: "+sequence+"\n");
+            //else                
+                //System.out.println("    Bus: "+ (ActiveTO+1) +"   [Already InActive] Packet: "+sequence+"\n");        
+        }
+    }
+    
     public static void main(String []args)
     {
         Queue<DatagramPacket> []input= new LinkedList[4];

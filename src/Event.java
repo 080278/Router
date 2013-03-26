@@ -5,6 +5,14 @@ public class Event implements Comparable
     private int ticks;
     //holds the action to be taken
     private String action;
+
+    //holds the Sequence of the packet holding the bus
+    int sequence;
+    //holds the Input buffer holding the bus
+    int inputBuffer;
+    //holds the Output buffer holding the bus
+    int outputBuffer;
+    
     
     //constructor
     public Event(int ticks, String action)
@@ -13,6 +21,32 @@ public class Event implements Comparable
         this.ticks = ticks;
         //set the action to be taken
         this.action = action;
+    }
+    
+    //set the release bus information
+    public void SetBusReleaseInfo(int outputBuffer, int inputBuffer, int sequence)
+    {
+        this.outputBuffer = outputBuffer;
+        this.inputBuffer = inputBuffer;
+        this.sequence = sequence;
+    }
+    
+    //get the output buffer number
+    public int GetOutputBuffer()
+    {
+        return outputBuffer;
+    }
+    
+    //get the input buffer number
+    public int GetInputBuffer()
+    {
+        return inputBuffer;
+    }
+    
+    //get the sequence number of the packet
+    public int GetSequence()
+    {
+        return sequence;
     }
     
     //set the object time

@@ -196,6 +196,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
             //update the simulator time
             TIME = current.GetTicks();
             
+            
             //checkevent for Capture Available Bus
             if (current.GetActionToBeTaken().compareToIgnoreCase("CaptureBus") == 0)
             {
@@ -243,12 +244,21 @@ System.out.println("Time: "+TIME+"   Attempting to capture a Bus -> ");
 //******************************************************************************
 //CANNOT BE '0', NEED VARIABLE, PROBLEM FOR Crossbar
 //if(sFabric.SetBusActiveStatus(0,FROM,peekPacket.GetSequenceNumber()) == true)
-if(sFabric.SetBusActiveStatus(0,FROM,peekPacket.GetSequenceNumber()) == true)
+if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber()) == true)
 //******************************************************************************    
                 {
-System.out.println("    Got Bus: "+sFabric.GetRecentBus()+"    for Packet#: "+sFabric.sequence);                    
+//System.out.println("    Got Bus: "+(sFabric.GetRecentBus()+1)+"    for Packet#: "+sFabric.sequence);                    
                     //add fabric switching events to the simulator
-                    readyQueue.add(new Event(TIME + sFabric.GetSpeed(), "FabricSwitching"));
+                    /*
+                    * release the Bus used to send packet
+                    */ 
+                   //create release event
+                   Event evt = new Event(TIME + sFabric.GetSpeed(), "FabricSwitching");
+                   //set the bus release information
+                   evt.SetBusReleaseInfo(TO, FROM, peekPacket.GetSequenceNumber());
+                   //put the event in the ready queue
+                   readyQueue.add(evt);
+System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());
                 }
             }
             
@@ -278,35 +288,74 @@ System.out.println("    Got Bus: "+sFabric.GetRecentBus()+"    for Packet#: "+sF
                 }
 
                 //ensure that the Output Buffer limit(s) are obeyed
-                if((outputBuffer[TO].size() + 1) <= limit)
+                if((outputBuffer[current.GetOutputBuffer()].size() + 1) <= limit)
                 {
-System.out.println("Input["+(FROM+1)+"]" +" = "+inputBuffer[FROM].size()+"    --> Output["+(TO+1)+"]" + " = "+ outputBuffer[TO].size());
+System.out.println("Time: "+ TIME +"   Input["+(current.GetInputBuffer())+"]" +" = "
+        +inputBuffer[current.GetInputBuffer()].size()+"    --> Output["
+        +(current.GetOutputBuffer())+"]" + " = "
+        + outputBuffer[current.GetOutputBuffer()].size());
 //*******************************************************************            
                     //randomly move packets
-                    busUsed = sFabric.MovePacket(FROM,TO, TIME);
+                    //busUsed = sFabric.MovePacket(FROM,TO, TIME);
+                    busUsed = sFabric.MovePacket(current.GetInputBuffer(),
+                                                 current.GetOutputBuffer(), TIME);
                     //increment packets moved from INPUT to OUTPUT Buffer
                     NumberOfPacketsMoved += 1;
                 
 //*******************************************************************
-System.out.println("Time: "+ TIME + "   Input["+(FROM+1)+"]" +" = "+
-        inputBuffer[FROM].size()+"    --> Output["+(TO+1)+"]" + " = "+ 
-        outputBuffer[TO].size()+"    <- Packet : "+
-        sFabric.GetCurrentPacketUsingTheBus()+
+                    /*
+System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
+        +inputBuffer[current.GetInputBuffer()].size()+"    --> Output["
+        +(current.GetOutputBuffer())+"]" + " = "
+        + outputBuffer[current.GetOutputBuffer()].size());                    
+                    */
+                    
+System.out.println("Time: "+ TIME + "   Input["+(current.GetInputBuffer())+"]" +" = "+
+        inputBuffer[current.GetInputBuffer()].size()+"    --> Output["+(current.GetOutputBuffer())+"]" + " = "+ 
+        outputBuffer[current.GetOutputBuffer()].size()+"    <- Packet : "+
+        sFabric.GetCurrentPacketUsingTheBus()); /*+
         "   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
-        "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+" ->\n");
+        "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+" ->");
+        */
+
+        /*
+         * release the Bus used to send packet
+         */ 
+        //create release event
+        Event evt = new Event(TIME, "ReleaseBus");
+        //set the bus release information
+        //evt.SetBusReleaseInfo(TO, FROM, sFabric.GetCurrentPacketUsingTheBus());
+        evt.SetBusReleaseInfo(current.GetOutputBuffer()
+                            , current.GetInputBuffer()
+                            , current.GetSequence());
+        //put the event in the ready queue
+        readyQueue.add(evt);
 //******************************************************************* 
                 }
                 else
                 {
-System.out.println("Time: "+ TIME + "    --> Output["+(TO+1)+"]" + " = "+ 
+System.out.println("\nTime: "+ TIME + "    --> Output["+(TO+1)+"]" + " = "+ 
         outputBuffer[TO].size()+"    Packet(s)"+ "    Cannot deliver Packet:"+
         sFabric.GetCurrentPacketUsingTheBus()+ "    --> Output["+(TO+1)+"]" +
         " -> F U L L\n");                    
                     //get the recent bus used by the fabric
                     busUsed = sFabric.GetRecentBus();
                 }
-                //release the Bus used to send packet
-                sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
+                
+                
+                //sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
+                //sFabric.SetBusInActiveStatus(TO, FROM,sFabric.GetCurrentPacketUsingTheBus());
+            }
+            //checkevent for Release Selected Bus
+            else if (current.GetActionToBeTaken().compareToIgnoreCase("ReleaseBus") == 0)
+            {
+                //Release Active Bus
+                sFabric.SetBusInActiveStatus(current.GetOutputBuffer(), 
+                                             current.GetInputBuffer(),
+                                             current.GetSequence());
+System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer()+
+        " TO: "+current.GetOutputBuffer()+
+        " Sequence: "+current.GetSequence()+"\n");                
             }
         }
         

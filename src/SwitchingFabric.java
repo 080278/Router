@@ -20,7 +20,8 @@ public abstract class SwitchingFabric implements InterfaceFabric{
 //NEED TO MODIFY FOR MULTIPLE BUSES IN THE CROSS BAR FABRIC    
 //IMPLEMENT USING ARRAY(S)    
     //holds the current input buffer using the bus
-    protected int currentInputBufferUsingTheBus;
+    //protected int currentInputBufferUsingTheBus;
+    protected int []currentInputBufferUsingTheBus;
     //holds the packet sequence number using the bus(es)
     protected int sequence;
 //********************************************************************    
@@ -50,7 +51,9 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         //creates statuses for each vertical bus
         busActiveStatus = new boolean[this.VERTICALBUSES];
         //set the current input buffer occupying the fabric bus, -1 = none
-        currentInputBufferUsingTheBus = -1;
+        currentInputBufferUsingTheBus = new int[inputBuffers.length];
+        for(int x=0; x<(inputBuffers.length);x++)
+            currentInputBufferUsingTheBus[x] = -1;
         
         
         //initialize each vertical bus to available
@@ -76,9 +79,9 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     //get which buffer using the Bus
-    public int GetCurrentInputBufferUsingTheBus()
+    public int GetCurrentInputBufferUsingTheBus(int busNumber)
     {
-        return currentInputBufferUsingTheBus;
+        return currentInputBufferUsingTheBus[busNumber];
     }
     
     //get which packet sequence using the Bus
