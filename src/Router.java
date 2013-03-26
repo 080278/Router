@@ -200,6 +200,15 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
             //checkevent for Capture Available Bus
             if (current.GetActionToBeTaken().compareToIgnoreCase("CaptureBus") == 0)
             {
+                //hold input buffer available for selection
+                ArrayList<Integer> bSelect = new ArrayList<Integer>();
+                //prepare list of buffers
+                for(int x=0; x<INPUTBUFFERS; x++)
+                {
+                    //add each buffer
+                    bSelect.add(x);
+                }
+
                 //update the next Capture Available Bus events time
                 current.SetTicks(current.GetTicks()+PULSE);
                 //put the updated Capture Available Bus back in the event queue
@@ -210,9 +219,21 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                 
 //*******************************************************************
 //NEED TO USE THE APPROPIATE Random Distribution
-                //get another buffer
-                FROM = st.nextInt(INPUTBUFFERS);
+                
+                //FROM = st.nextInt(INPUTBUFFERS);
+                //ensure there's packet(s) in the selected input buffer, to be switched
+                while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
+                {
+??need to chack for no packet, get new set of packets                    
+                    //get another buffer
+                    int idx = st.nextInt(bSelect.size());
+                    //get the index value
+                    FROM = bSelect.get(idx);
+                    //remove the buffer already selected
+                    bSelect.remove(idx);
                     
+                }
+?? implement, each buffer input, first packet                     
                 //ensure there's packet(s) in the selected input buffer, to be switched
                 while(((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null) && 
                        (NumberOfPacketsMoved < totalNumberOfPackets))
