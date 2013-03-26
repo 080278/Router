@@ -222,9 +222,9 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                 
                 //FROM = st.nextInt(INPUTBUFFERS);
                 //ensure there's packet(s) in the selected input buffer, to be switched
-                while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
+//while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
                 {
-??need to chack for no packet, get new set of packets                    
+//??need to chack for no packet, get new set of packets                    
                     //get another buffer
                     int idx = st.nextInt(bSelect.size());
                     //get the index value
@@ -233,7 +233,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                     bSelect.remove(idx);
                     
                 }
-?? implement, each buffer input, first packet                     
+//?? implement, each buffer input, first packet                     
                 //ensure there's packet(s) in the selected input buffer, to be switched
                 while(((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null) && 
                        (NumberOfPacketsMoved < totalNumberOfPackets))
