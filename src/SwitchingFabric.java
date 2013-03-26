@@ -23,7 +23,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     //protected int currentInputBufferUsingTheBus;
     protected int []currentInputBufferUsingTheBus;
     //holds the packet sequence number using the bus(es)
-    protected int sequence;
+    protected int []sequence;
 //********************************************************************    
     
     //moves a packet from input buffer to output buffer
@@ -50,6 +50,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         this.outputBuffers = outputBuffers;
         //creates statuses for each vertical bus
         busActiveStatus = new boolean[this.VERTICALBUSES];
+        sequence = new int[VERTICALBUSES];
         //set the current input buffer occupying the fabric bus, -1 = none
         currentInputBufferUsingTheBus = new int[inputBuffers.length];
         for(int x=0; x<(inputBuffers.length);x++)
@@ -85,9 +86,9 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     }
     
     //get which packet sequence using the Bus
-    public int GetCurrentPacketUsingTheBus()
+    public int GetCurrentPacketUsingTheBus(int busNumber)
     {
-        return sequence;
+        return sequence[busNumber];
     }
     
     //get the speed of the fabric

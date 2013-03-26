@@ -35,7 +35,7 @@ public class Crossbar extends SwitchingFabric{
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
         
         //esure there is a packet to move, packet activate bus successfully,bus becomes active 
-        if((peekPacket != null) && (sequence == peekPacket.GetSequenceNumber()) && 
+        if((peekPacket != null) && (sequence[outputBufferNumber] == peekPacket.GetSequenceNumber()) && 
            (GetBusActiveStatus(recentBus)== true))
         {
             //ensure there is packet in the buffer
@@ -69,9 +69,20 @@ public class Crossbar extends SwitchingFabric{
         //only one bus present in this fabric type, 
         //busNumber = 0;
         
+        //indicate if the packet has a bus already active
+        boolean packetAlreadyHasAnActiveBus = false;
+        
+        //see if this packetSequence alread has a bus
+        for(int y=0; y<VERTICALBUSES; y++)
+        {
+            if (sequence[y] == packetSequence)
+                packetAlreadyHasAnActiveBus = true;
+        }
+        
         //ensure valid busNumber chosen
         if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0) &&
-            (busActiveStatus[busNumber] == false))
+            (busActiveStatus[busNumber] == false) &&
+            (packetAlreadyHasAnActiveBus != true))
         {
             //check if bus free, or already used by a buffer
             if ((currentInputBufferUsingTheBus[busNumber] == -1) ||
@@ -84,7 +95,7 @@ public class Crossbar extends SwitchingFabric{
                 currentInputBufferUsingTheBus[busNumber] = inputBufferNumber;
                 
                 //keep track of the packet sequence using the bus
-                sequence = packetSequence;
+                sequence[busNumber] = packetSequence;
                 
                 //set the recently used bus
                 recentBus = busNumber;
@@ -115,7 +126,7 @@ Print(false, busNumber,packetSequence,true);
             //check if bus free, or already used by a buffer
             if (((currentInputBufferUsingTheBus[busNumber] == -1) ||
                 (currentInputBufferUsingTheBus[busNumber] == inputBufferNumber)) &&
-                (sequence == packetSequence))
+                (sequence[busNumber] == packetSequence))
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;
@@ -124,7 +135,7 @@ Print(false, busNumber,packetSequence,true);
                 currentInputBufferUsingTheBus[busNumber] = -1;
                 
                 //no packet using the bus
-                sequence = -1;
+                sequence[busNumber] = -1;
 
 Print(true, busNumber,packetSequence,false);                
                 //successfully released the bus

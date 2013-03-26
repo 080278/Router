@@ -35,7 +35,7 @@ public class Bus extends SwitchingFabric{
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
 
         //esure there is a packet to move, packet activate bus successfully,bus becomes active 
-        if((peekPacket != null) && (sequence == peekPacket.GetSequenceNumber()) && 
+        if((peekPacket != null) && (sequence[0] == peekPacket.GetSequenceNumber()) && 
            (GetBusActiveStatus(0)== true))
         {
             //ensure there is packet in the buffer
@@ -86,7 +86,7 @@ public class Bus extends SwitchingFabric{
                 currentInputBufferUsingTheBus[busNumber] = inputBufferNumber;
                 
                 //keep track of the packet sequence using the bus
-                sequence = packetSequence;
+                sequence[busNumber] = packetSequence;
                 
                 //set the recently used bus
                 recentBus = busNumber;
@@ -117,7 +117,7 @@ Print(false, busNumber,packetSequence,true);
             //check if bus free, or already used by a buffer
             if (((currentInputBufferUsingTheBus[busNumber] == -1) ||
                 (currentInputBufferUsingTheBus[busNumber] == inputBufferNumber)) &&
-                (sequence == packetSequence))
+                (sequence[0] == packetSequence))
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;
@@ -126,7 +126,7 @@ Print(false, busNumber,packetSequence,true);
                 currentInputBufferUsingTheBus[busNumber] = -1;
                 
                 //no packet using the bus
-                sequence = -1;
+                sequence[0] = -1;
                 
 Print(true, busNumber,packetSequence,false); 
                 //successfully released the bus
