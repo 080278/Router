@@ -401,7 +401,8 @@ System.out.println("Time: "+ TIME + "    Input["+(current.GetInputBuffer())+"]" 
                 {
 System.out.println("\nTime: "+ TIME + "    --> Output["+(TO+1)+"]" + " = "+ 
         outputBuffer[TO].size()+"    Packet(s)"+ "    Cannot deliver Packet:"+
-        sFabric.GetCurrentPacketUsingTheBus(current.GetOutputBuffer())+ "    --> Output["+(TO+1)+"]" +
+        //sFabric.GetCurrentPacketUsingTheBus(current.GetOutputBuffer())+ "    --> Output["+(TO+1)+"]" +
+        sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+ "    --> Output["+(TO+1)+"]" +
         " -> F U L L\n");                    
                     //get the recent bus used by the fabric
                     busUsed = sFabric.GetRecentBus();

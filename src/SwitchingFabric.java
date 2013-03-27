@@ -89,6 +89,7 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
     //get which packet sequence using the Bus
     public int GetCurrentPacketUsingTheBus(int busNumber)
     {
+System.out.println("*** GetCurrentPacketUsingTheBus ( "+busNumber+" ) ***");
         return sequence[busNumber];
     }
     
