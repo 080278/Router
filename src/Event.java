@@ -6,12 +6,14 @@ public class Event implements Comparable
     //holds the action to be taken
     private String action;
 
+    //holds the bus to be used
+    private int bus;
     //holds the Sequence of the packet holding the bus
-    int sequence;
+    private int sequence;
     //holds the Input buffer holding the bus
-    int inputBuffer;
+    private int inputBuffer;
     //holds the Output buffer holding the bus
-    int outputBuffer;
+    private int outputBuffer;
     
     
     //constructor
@@ -24,11 +26,12 @@ public class Event implements Comparable
     }
     
     //set the release bus information
-    public void SetBusReleaseInfo(int outputBuffer, int inputBuffer, int sequence)
+    public void SetBusReleaseInfo(int outputBuffer, int inputBuffer, int sequence, int bus)
     {
         this.outputBuffer = outputBuffer;
         this.inputBuffer = inputBuffer;
         this.sequence = sequence;
+        this.bus = bus;
     }
     
     //get the output buffer number
@@ -48,6 +51,13 @@ public class Event implements Comparable
     {
         return sequence;
     }
+    
+    //get the bus to be used
+    public int GetBus()
+    {
+        return bus;
+    }
+    
     
     //set the object time
     public void SetTicks(int ticks)

@@ -29,9 +29,9 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     //moves a packet from input buffer to output buffer
     public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME);
     //attempt to Takes control of the Fabric Bus
-    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence);
+    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME);
     //attempt to Release control of the Fabric Bus
-    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence);
+    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME);
     //get the recent packet moved
     public abstract RouterPacket GetRecentPacket();
     //get the recent bus used moved

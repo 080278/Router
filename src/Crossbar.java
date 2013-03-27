@@ -63,7 +63,7 @@ public class Crossbar extends SwitchingFabric{
         return recentBus;
     }
     //attempt to Takes control of the Fabric Bus
-    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME)
     {
         //REMOVE IN CROSSBAR FABRIC TYPE
         //only one bus present in this fabric type, 
@@ -100,20 +100,20 @@ public class Crossbar extends SwitchingFabric{
                 //set the recently used bus
                 recentBus = busNumber;
 
-Print(true, busNumber,packetSequence,true);                
+Print(true, busNumber,packetSequence,true,TIME);                
                 //successfully controlled the bus
                 return true;
             }
         }
         
-Print(false, busNumber,packetSequence,true);        
+Print(false, busNumber,packetSequence,true,TIME);        
         //was unable to control the bus
         return false;
     }
     
     
     //attempt to Release control of the Fabric Bus
-    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence)
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME)
     {
         //REMOVE IN CROSSBAR FABRIC TYPE
         //only one bus present in this fabric type, 
@@ -137,13 +137,13 @@ Print(false, busNumber,packetSequence,true);
                 //no packet using the bus
                 sequence[busNumber] = -1;
 
-Print(true, busNumber,packetSequence,false);                
+Print(true, busNumber,packetSequence,false,TIME);                
                 //successfully released the bus
                 return true;
             }
         }
         
-Print(false, busNumber,packetSequence,false);        
+Print(false, busNumber,packetSequence,false,TIME);        
         //was unable to control the bus
         return false;
     }
@@ -160,21 +160,19 @@ Print(false, busNumber,packetSequence,false);
         return recentBus;
     }
 
-    public static void Print(boolean result, int ActiveTO, int sequence, boolean active)
+    public static void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME)
     {
         if(active)
         {
             if(result)        
-                System.out.println("    Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
+                System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
             else                
-                System.out.println("    Bus: "+ (ActiveTO+1) +"   [Already Active]   Packet: "+sequence);        
+                System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Packet: "+sequence+"   [Already Active]" );        
         }
         else
         {
             if(result)        
-                System.out.println("    Bus: "+ (ActiveTO+1) +"   Set -> INACTIVE    Packet: "+sequence+"\n");
-            //else                
-                //System.out.println("    Bus: "+ (ActiveTO+1) +"   [Already InActive] Packet: "+sequence+"\n");        
+                System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Set -> INACTIVE    Packet: "+sequence);
         }
     }
     public static void main(String []args)
@@ -266,32 +264,32 @@ Print(false, busNumber,packetSequence,false);
 FROM = 0;
 active = 0;
         peekPacket = (RouterPacket)input[FROM].peek();
-        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber());
-Print(result, active,peekPacket.GetSequenceNumber(),true);
+        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
+Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 FROM = 1;
 active = 1;
         peekPacket = (RouterPacket)input[FROM].peek();
-        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber());
-Print(result, active,peekPacket.GetSequenceNumber(),true);
+        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
+Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 FROM = 1;
 inactive = 1;
-        result = tst.SetBusInActiveStatus(inactive,FROM,peekPacket.GetSequenceNumber());
-Print(result, inactive,peekPacket.GetSequenceNumber(),false);
+        result = tst.SetBusInActiveStatus(inactive,FROM,peekPacket.GetSequenceNumber(),0);
+Print(result, inactive,peekPacket.GetSequenceNumber(),false,0);
 
 
 FROM = 0;
 active = 2;
         peekPacket = (RouterPacket)input[FROM].peek();
-        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber());
-Print(result, active,peekPacket.GetSequenceNumber(),true);
+        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
+Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 FROM = 0;
 active = 3;
         peekPacket = (RouterPacket)input[FROM].peek();
-        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber());
-Print(result, active,peekPacket.GetSequenceNumber(),true);
+        result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
+Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 /*
 FROM = 0;
