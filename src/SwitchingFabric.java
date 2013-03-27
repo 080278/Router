@@ -13,9 +13,11 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     //holds the speed that the fabric is operating at
     private int speed;
     //holds the list of input buffers
-    protected Queue []inputBuffers;
+    protected static Queue []inputBuffers;
     //holds the list of output buffers
     protected Queue []outputBuffers;
+    //indicates a packet was sucessfully moved
+    protected boolean packetMoved;
 //********************************************************************
 //NEED TO MODIFY FOR MULTIPLE BUSES IN THE CROSS BAR FABRIC    
 //IMPLEMENT USING ARRAY(S)    
@@ -50,11 +52,15 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         this.outputBuffers = outputBuffers;
         //creates statuses for each vertical bus
         busActiveStatus = new boolean[this.VERTICALBUSES];
+        //initialize buses
         sequence = new int[VERTICALBUSES];
+        //initialize packetMoved
+        packetMoved = false;
         //set the current input buffer occupying the fabric bus, -1 = none
 //currentInputBufferUsingTheBus = new int[inputBuffers.length];
 currentInputBufferUsingTheBus = new int[outputBuffers.length];
-        for(int x=0; x<(inputBuffers.length);x++)
+        //for(int x=0; x<(inputBuffers.length);x++)
+        for(int x=0; x<(outputBuffers.length);x++)
             currentInputBufferUsingTheBus[x] = -1;
         
         
@@ -66,6 +72,17 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
         }
     }
     
+    //get if packet was moved successfully
+    public boolean GetPacketMoved()
+    {
+        return packetMoved;
+    }
+    
+    //get input buffers
+    public Queue[] GetInputBuffers()
+    {
+        return inputBuffers;
+    }
     
     //get number of vertical buses
     public int GetVerticalBuses()
@@ -89,7 +106,6 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
     //get which packet sequence using the Bus
     public int GetCurrentPacketUsingTheBus(int busNumber)
     {
-System.out.println("*** GetCurrentPacketUsingTheBus ( "+busNumber+" ) ***");
         return sequence[busNumber];
     }
     

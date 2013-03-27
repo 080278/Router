@@ -31,6 +31,9 @@ public class Crossbar extends SwitchingFabric{
         //if Active status was successful and the flag is true for having
         //control of the bus
         
+        //set packet moved default
+        packetMoved = false;
+        
         //get the RouterPacket in the InputBuffer selected
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
         
@@ -55,6 +58,9 @@ public class Crossbar extends SwitchingFabric{
                 
                 //move the data to the output buffer
                 this.outputBuffers[outputBufferNumber].add(rPacket);
+                
+                //set packet successfully moved
+                packetMoved = true;
                 
             }
         }
@@ -166,8 +172,16 @@ Print(false, busNumber,packetSequence,false,TIME);
         {
             if(result)        
                 System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
-            else                
-                System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Packet: "+sequence+"   [Already Active]" );        
+            else{                
+                System.out.print("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Packet: "+sequence+"   [Already Active]" );        
+/*                
+                for(int x=0; x<inputBuffers.length; x++)
+                {
+                    System.out.print("   InB"+(x+1)+": "+inputBuffers[x].size());
+                }
+*/ 
+                System.out.print("\n");
+            }
         }
         else
         {

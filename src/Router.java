@@ -353,18 +353,22 @@ System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequenc
                 //ensure that the Output Buffer limit(s) are obeyed
                 if((outputBuffer[current.GetOutputBuffer()].size() + 1) <= limit)
                 {
-System.out.println("Time: "+ TIME +"    Input["+(current.GetInputBuffer())+"]" +" = "
-        +inputBuffer[current.GetInputBuffer()].size()+"    --> Output["
-        +(current.GetOutputBuffer())+"]" + " = "
-        + outputBuffer[current.GetOutputBuffer()].size());
+
 //*******************************************************************            
                     //randomly move packets
                     //busUsed = sFabric.MovePacket(FROM,TO, TIME);
                     busUsed = sFabric.MovePacket(current.GetInputBuffer(),
                                                  current.GetOutputBuffer(), TIME);
-                    //increment packets moved from INPUT to OUTPUT Buffer
-                    NumberOfPacketsMoved += 1;
-                
+                    //check packet was successfully moved
+                    if(sFabric.GetPacketMoved())
+                    {
+                        //increment packets moved from INPUT to OUTPUT Buffer
+                        NumberOfPacketsMoved += 1;
+                    }
+System.out.println("Time: "+ TIME +"    Input["+(current.GetInputBuffer())+"]" +" = "
+        +inputBuffer[current.GetInputBuffer()].size()+"    --> Output["
+        +(current.GetOutputBuffer())+"]" + " = "
+        + outputBuffer[current.GetOutputBuffer()].size()+"    PKT(S)-Moved:"+NumberOfPacketsMoved);                
 //*******************************************************************
                     /*
 System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
