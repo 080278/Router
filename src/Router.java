@@ -298,25 +298,29 @@ pFactory.DeliverPacket(1, inputBuffer, cfg);
                      */ 
 //System.out.println("Time: "+TIME+"   Packet: "+peekPacket.GetSequenceNumber()+"    Buffer: "+FROM+"    Attempting to capture a Bus -> ");    
 
-                    if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
+//if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
+if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
                     {
+System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());                        
 //System.out.println("    Got Bus: "+(sFabric.GetRecentBus()+1)+"    for Packet#: "+sFabric.sequence);                    
                         //add fabric switching events to the simulator
                         /*
                         * release the Bus used to send packet
                         */ 
+/*
                         if(sFabric instanceof Bus )
                         {
                             //always 1 bus
-                            TO = 0;
+                            bus = 0;
                         }
+*/ 
                        //create release event
                        Event evt = new Event(TIME + sFabric.GetSpeed(), "FabricSwitching");
                        //set the bus release information
-                       evt.SetBusReleaseInfo(TO, FROM, peekPacket.GetSequenceNumber(),TO);
+                       evt.SetBusReleaseInfo(TO, FROM, peekPacket.GetSequenceNumber(),sFabric.GetRecentBus());
                        //put the event in the ready queue
                        readyQueue.add(evt);
-//System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());
+
                     }
                 
             }

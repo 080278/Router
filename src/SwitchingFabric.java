@@ -52,7 +52,8 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         busActiveStatus = new boolean[this.VERTICALBUSES];
         sequence = new int[VERTICALBUSES];
         //set the current input buffer occupying the fabric bus, -1 = none
-        currentInputBufferUsingTheBus = new int[inputBuffers.length];
+//currentInputBufferUsingTheBus = new int[inputBuffers.length];
+currentInputBufferUsingTheBus = new int[outputBuffers.length];
         for(int x=0; x<(inputBuffers.length);x++)
             currentInputBufferUsingTheBus[x] = -1;
         

@@ -78,7 +78,7 @@ public class Crossbar extends SwitchingFabric{
             if (sequence[y] == packetSequence)
                 packetAlreadyHasAnActiveBus = true;
         }
-        
+//System.out.println("busNumber :- "+(busNumber+1)+ "   SIZE of currentInputBufferUsingTheBus: "+currentInputBufferUsingTheBus.length);
         //ensure valid busNumber chosen
         if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0) &&
             (busActiveStatus[busNumber] == false) &&

@@ -79,6 +79,7 @@ public class Bus extends SwitchingFabric{
             if ((currentInputBufferUsingTheBus[busNumber] == -1) ||
                 (currentInputBufferUsingTheBus[busNumber] == inputBufferNumber)) 
             {
+//System.out.println("busNumber :- "+(busNumber+1)+ "   SIZE of currentInputBufferUsingTheBus: "+currentInputBufferUsingTheBus.length);                
                 //set the status of the bus
                 busActiveStatus[busNumber] = true;
 
@@ -158,7 +159,7 @@ Print(false, busNumber,packetSequence,false,TIME);
             if(result)        
                 System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
             else                
-                System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"Packet: "+sequence+"   [Already Active]" );        
+                System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Packet: "+sequence+"   [Already Active]" );        
         }
         else
         {
