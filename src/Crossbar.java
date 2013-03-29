@@ -96,6 +96,12 @@ public class Crossbar extends SwitchingFabric{
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = true;
+                
+                //remove the bus from available buses
+                availableBuses.remove((Object)busNumber);
+                
+                //add input buffer connected to a bus
+                inputConnectedToBus.add((Object)inputBufferNumber);
 
                 //keep track of the buffer using the bus
                 currentInputBufferUsingTheBus[busNumber] = inputBufferNumber;
@@ -136,6 +142,12 @@ Print(false, busNumber,packetSequence,true,TIME);
             {
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;
+                
+                //add the bus back to available buses
+                availableBuses.add((Object)busNumber);
+                
+                //remove input buffer NOT connected to a bus
+                inputConnectedToBus.remove((Object)inputBufferNumber);
                 
                 //no buffer using the bus
                 currentInputBufferUsingTheBus[busNumber] = -1;

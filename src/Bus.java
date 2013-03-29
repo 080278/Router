@@ -88,6 +88,12 @@ public class Bus extends SwitchingFabric{
 //System.out.println("busNumber :- "+(busNumber+1)+ "   SIZE of currentInputBufferUsingTheBus: "+currentInputBufferUsingTheBus.length);                
                 //set the status of the bus
                 busActiveStatus[busNumber] = true;
+                
+                //remove the bus from available buses
+                availableBuses.remove(busNumber);
+                
+                //add input buffer connected to a bus
+                inputConnectedToBus.add((Object)inputBufferNumber);
 
                 //keep track of the buffer using the bus
                 currentInputBufferUsingTheBus[busNumber] = inputBufferNumber;
@@ -129,6 +135,12 @@ Print(false, busNumber,packetSequence,true,TIME);
                 //set the status of the bus
                 busActiveStatus[busNumber] = false;
                 
+                //add the bus back to available buses
+                availableBuses.add(busNumber);
+                
+                //remove input buffer NOT connected to a bus
+                inputConnectedToBus.remove((Object)inputBufferNumber);
+                
                 //no buffer using the bus
                 currentInputBufferUsingTheBus[busNumber] = -1;
                 
@@ -145,6 +157,7 @@ Print(false, busNumber,packetSequence,false,TIME);
         //was unable to control the bus
         return false;
     }
+    
     
     //get the recent packet moved
     public RouterPacket GetRecentPacket()

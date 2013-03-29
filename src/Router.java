@@ -215,114 +215,137 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                     for(int x=0; x<INPUTBUFFERS; x++)
                     //for(int x=0; x<sFabric.GetVerticalBuses(); x++)
                     {
-                        //add each buffer
-                        bSelect.add(x);
-                    }
-                }
-                //update the next Capture Available Bus events time
-                current.SetTicks(current.GetTicks()+PULSE);
-                //put the updated Capture Available Bus back in the event queue
-                readyQueue.add(current);
-                
-                //holds peek at the RouterPacket sequence number
-                RouterPacket peekPacket; 
-                
-//*******************************************************************
-//NEED TO USE THE APPROPIATE Random Distribution
-                
-                //FROM = st.nextInt(INPUTBUFFERS);
-/*                
-                //ensure there's packet(s) in the selected input buffer, to be switched
-//while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
-                {
-//??need to chack for no packet, get new set of packets   
-*/ 
-//*****************************************************************************                
-                    //select a buffer
-                    int idx = st.nextInt(bSelect.size());
-                    //get the index value
-                    FROM = bSelect.get(idx);
-                    
-//*****************************************************************************
-/*                    
-                }
-//?? implement, each buffer input, first packet     
-*/                
-                //ensure there's packet(s) in the selected input buffer, to be switched
-                while(((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null) && 
-                       (NumberOfPacketsMoved < totalNumberOfPackets))
-                {
-//*************************                    
-//NEED TO ALLOCATE PROPERLY                    
-//puts 1024 packets in the the Input Buffers, every time                
-pFactory.DeliverPacket(1, inputBuffer, cfg);
-//*************************
-
-//***********************************************************
-//NEED TO HANDLE RANDOM PROPERLY
-//get another buffer
-//FROM = st.nextInt(INPUTBUFFERS);
-                //start a fresh list of buffers
-                bSelect.clear();
-                if(bSelect.size() == 0)
-                {
-                    //prepare list of INPUT buffers
-                    for(int x=0; x<INPUTBUFFERS; x++)
-                    //for(int x=0; x<sFabric.GetVerticalBuses(); x++)
-                    {
-                        //add each buffer
-                        bSelect.add(x);
-                    }
-                }
-//*****************************************************************************                
-                    //select a buffer
-                    idx = st.nextInt(bSelect.size());
-                    //get the index value
-                    FROM = bSelect.get(idx);
-                    
-//*****************************************************************************
-//***********************************************************                    
-                }
-                //remove the buffer already selected
-                bSelect.remove(idx);
-                //set the TO buffer
-                TO = st.nextInt(OUTPUTBUFFERS);
-            
-//*******************************************************************                
-                
-                    //attempt to capture a free bus in the fabric
-                    /*
-                     * Memory Fabric -  Maximum 1 bus = bus 0
-                     * Bus Fabric - Maximum 1 bus = bus 0
-                     * Crossbar Fabric - Maximum 1 INFINITY(max integer)
-                     */ 
-//System.out.println("Time: "+TIME+"   Packet: "+peekPacket.GetSequenceNumber()+"    Buffer: "+FROM+"    Attempting to capture a Bus -> ");    
-
-//if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
-if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
-                    {
-System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());                        
-//System.out.println("    Got Bus: "+(sFabric.GetRecentBus()+1)+"    for Packet#: "+sFabric.sequence);                    
-                        //add fabric switching events to the simulator
-                        /*
-                        * release the Bus used to send packet
-                        */ 
-/*
-                        if(sFabric instanceof Bus )
+                        if(sFabric.GetInputBufferConnectionStatus(x) == false)
                         {
-                            //always 1 bus
-                            bus = 0;
+                            //add each buffer
+                            bSelect.add(x);
                         }
-*/ 
-                       //create release event
-                       Event evt = new Event(TIME + sFabric.GetSpeed(), "FabricSwitching");
-                       //set the bus release information
-                       evt.SetBusReleaseInfo(TO, FROM, peekPacket.GetSequenceNumber(),sFabric.GetRecentBus());
-                       //put the event in the ready queue
-                       readyQueue.add(evt);
-
                     }
+                }
                 
+                if(bSelect.size() > 0)
+                {
+                    //update the next Capture Available Bus events time
+                    current.SetTicks(current.GetTicks()+PULSE);
+                    //put the updated Capture Available Bus back in the event queue
+                    readyQueue.add(current);
+
+                    //holds peek at the RouterPacket sequence number
+                    RouterPacket peekPacket; 
+
+    //*******************************************************************
+    //NEED TO USE THE APPROPIATE Random Distribution
+
+                    //FROM = st.nextInt(INPUTBUFFERS);
+    /*                
+                    //ensure there's packet(s) in the selected input buffer, to be switched
+    //while((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null)
+                    {
+    //??need to chack for no packet, get new set of packets   
+    */ 
+    //*****************************************************************************                
+                        //select a buffer
+                        int idx = st.nextInt(bSelect.size());
+                        //get the index value
+                        FROM = bSelect.get(idx);
+
+    //*****************************************************************************
+    /*                    
+                    }
+    //?? implement, each buffer input, first packet     
+    */                
+                    //ensure there's packet(s) in the selected input buffer, to be switched
+                    while(((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null) && 
+                           (NumberOfPacketsMoved < totalNumberOfPackets) &&
+                           (pFactory.GetPacketsRemaining() > 0))
+                    {
+    //*************************                    
+    //NEED TO ALLOCATE PROPERLY                    
+    //puts 1024 packets in the the Input Buffers, every time                
+    pFactory.DeliverPacket(1, inputBuffer, cfg);
+    //*************************
+
+    //***********************************************************
+    //NEED TO HANDLE RANDOM PROPERLY
+    //get another buffer
+    //FROM = st.nextInt(INPUTBUFFERS);
+                    //start a fresh list of buffers
+                    bSelect.clear();
+                    if(bSelect.size() == 0)
+                    {
+
+                            //prepare list of INPUT buffers
+                            for(int x=0; x<INPUTBUFFERS; x++)
+                            //for(int x=0; x<sFabric.GetVerticalBuses(); x++)
+                            {
+                                if(sFabric.GetInputBufferConnectionStatus(x) == false)
+                                {
+                                    //add each buffer
+                                    bSelect.add(x);
+                                }
+                            }
+                    }
+    //*****************************************************************************                
+                        //select a buffer
+                        idx = st.nextInt(bSelect.size());
+                        //get the index value
+                        FROM = bSelect.get(idx);
+
+    //*****************************************************************************
+    //***********************************************************                    
+                    }
+                    //remove the buffer already selected
+                    bSelect.remove(idx);
+
+    //ensure there is available bus(es)
+    if((sFabric.GetAvailableBusCount() > 0) && (this.inputBuffer[FROM].size() > 0))
+                    {                
+                    //set the TO buffer, based on available buses
+                    TO = sFabric.GetBusNumberInAvailableBus(st.nextInt(sFabric.GetAvailableBusCount()));
+
+    //*******************************************************************                
+
+                        //attempt to capture a free bus in the fabric
+                        /*
+                         * Memory Fabric -  Maximum 1 bus = bus 0
+                         * Bus Fabric - Maximum 1 bus = bus 0
+                         * Crossbar Fabric - Maximum 1 INFINITY(max integer)
+                         */ 
+    //System.out.println("Time: "+TIME+"   Packet: "+peekPacket.GetSequenceNumber()+"    Buffer: "+FROM+"    Attempting to capture a Bus -> ");    
+
+
+    if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
+                        {
+    System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());                        
+    //System.out.println("    Got Bus: "+(sFabric.GetRecentBus()+1)+"    for Packet#: "+sFabric.sequence);                    
+                            //add fabric switching events to the simulator
+                            /*
+                            * release the Bus used to send packet
+                            */ 
+    /*
+                            if(sFabric instanceof Bus )
+                            {
+                                //always 1 bus
+                                bus = 0;
+                            }
+    */ 
+                           //create release event
+                           Event evt = new Event(TIME + sFabric.GetSpeed(), "FabricSwitching");
+                           //set the bus release information
+                           evt.SetBusReleaseInfo(TO, FROM, peekPacket.GetSequenceNumber(),sFabric.GetRecentBus());
+                           //put the event in the ready queue
+                           readyQueue.add(evt);
+
+                        }
+                    }
+                }
+                else
+                {
+                    //update the next Capture Available Bus events time
+                    current.SetTicks(current.GetTicks()+PULSE);
+                    //put the updated Capture Available Bus back in the event queue
+                    readyQueue.add(current);
+                }
             }
             
             //checkevent for fabric switching

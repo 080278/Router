@@ -55,6 +55,12 @@ public class PacketFactory
         MakeAllPackets();
     }
     
+    //get packets remaining in the packetCreated Queue
+    public int GetPacketsRemaining()
+    {
+        return packetCreated.size();
+    }
+    
     //make data
     private byte[] CreateData()
     {
@@ -149,7 +155,7 @@ public class PacketFactory
 //***************************************************************        
 //NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPIATELY  
 for(int y=0;y<inputBuffer.length;y++)
-    for(int x=0;x<1024;x++)
+    for(int x=0;x<1;x++)
             {
                 //size limit of the Input buffer
                 int limit;

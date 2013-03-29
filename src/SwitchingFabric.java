@@ -18,6 +18,10 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     protected Queue []outputBuffers;
     //indicates a packet was sucessfully moved
     protected boolean packetMoved;
+    //holds a list of available buses
+    protected LinkedList availableBuses;
+    //holds a list of inputBuffers using fabric bus
+    protected LinkedList inputConnectedToBus;
 //********************************************************************
 //NEED TO MODIFY FOR MULTIPLE BUSES IN THE CROSS BAR FABRIC    
 //IMPLEMENT USING ARRAY(S)    
@@ -52,6 +56,10 @@ public abstract class SwitchingFabric implements InterfaceFabric{
         this.outputBuffers = outputBuffers;
         //creates statuses for each vertical bus
         busActiveStatus = new boolean[this.VERTICALBUSES];
+        //initialize available buses
+        availableBuses = new LinkedList();
+        //initialize input connected to bus
+        inputConnectedToBus = new LinkedList();
         //initialize buses
         sequence = new int[VERTICALBUSES];
         //initialize packetMoved
@@ -69,7 +77,27 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
         {
             //initialize each vertical bus to available
             busActiveStatus[x] = false;
+            //initialize each vertical bus to available
+            availableBuses.add(x);
         }
+    }
+    
+    //get input connection status
+    public boolean GetInputBufferConnectionStatus(int buffer)
+    {
+        return inputConnectedToBus.contains((Object)buffer);
+    }
+    
+    //get the size of the available bus
+    public int GetAvailableBusCount()
+    {
+        return availableBuses.size();
+    }
+    
+    //get bus number in availableBuses LinkedList
+    public int GetBusNumberInAvailableBus(int index)
+    {
+        return (int)availableBuses.get(index);
     }
     
     //get if packet was moved successfully
