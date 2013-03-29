@@ -171,14 +171,14 @@ Print(false, busNumber,packetSequence,false,TIME);
         return recentBus;
     }
         
-    public static void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME)
+    public void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME)
     {
         if(active)
         {
             if(result)        
                 System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
             else{         
-                System.out.print("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Packet: "+sequence+"   [Already Active]" );        
+                System.out.print("\nTime: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   [Already Active]"+"   Packet: "+sequence );        
 /*                
                 for(int x=0; x<inputBuffers.length; x++)
                 {

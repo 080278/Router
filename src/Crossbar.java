@@ -178,14 +178,14 @@ Print(false, busNumber,packetSequence,false,TIME);
         return recentBus;
     }
 
-    public static void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME)
+    public void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME)
     {
         if(active)
         {
             if(result)        
                 System.out.println("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Set -> ACTIVE      Packet: "+sequence);
             else{                
-                System.out.print("Time: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   Packet: "+sequence+"   [Already Active]" );        
+                System.out.print("\nTime: "+ TIME +"    Attempting Bus: "+ (ActiveTO+1) +"   [Already Active]" +"   Packet: "+sequence);        
 /*                
                 for(int x=0; x<inputBuffers.length; x++)
                 {
@@ -291,31 +291,31 @@ FROM = 0;
 active = 0;
         peekPacket = (RouterPacket)input[FROM].peek();
         result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
-Print(result, active,peekPacket.GetSequenceNumber(),true,0);
+tst.Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 FROM = 1;
 active = 1;
         peekPacket = (RouterPacket)input[FROM].peek();
         result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
-Print(result, active,peekPacket.GetSequenceNumber(),true,0);
+tst.Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 FROM = 1;
 inactive = 1;
         result = tst.SetBusInActiveStatus(inactive,FROM,peekPacket.GetSequenceNumber(),0);
-Print(result, inactive,peekPacket.GetSequenceNumber(),false,0);
+tst.Print(result, inactive,peekPacket.GetSequenceNumber(),false,0);
 
 
 FROM = 0;
 active = 2;
         peekPacket = (RouterPacket)input[FROM].peek();
         result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
-Print(result, active,peekPacket.GetSequenceNumber(),true,0);
+tst.Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 FROM = 0;
 active = 3;
         peekPacket = (RouterPacket)input[FROM].peek();
         result = tst.SetBusActiveStatus(active,FROM,peekPacket.GetSequenceNumber(),0);
-Print(result, active,peekPacket.GetSequenceNumber(),true,0);
+tst.Print(result, active,peekPacket.GetSequenceNumber(),true,0);
 
 /*
 FROM = 0;

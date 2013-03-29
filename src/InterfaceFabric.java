@@ -13,4 +13,6 @@ public interface InterfaceFabric {
     public abstract RouterPacket GetRecentPacket();
     //get the recent bus used
     public abstract int GetRecentBus();
+    //print status of the fabric
+    public abstract void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME);
 }   

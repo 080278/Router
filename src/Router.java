@@ -180,14 +180,21 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         //holds the current event
         Event current;
         
+        //holds peek at the RouterPacket sequence number
+        RouterPacket peekPacket;
+        
         //create all packets needed
         PacketFactory pFactory = new PacketFactory(totalNumberOfPackets,PACKETSIZE, INPUTBUFFERS );
+        //create packet consumption object
+        PacketConsumption pConsumer = new PacketConsumption(TIME, cfg);
         
         //attempt to capture each bus for input packets
         for(int x=0; x<sFabric.GetVerticalBuses(); x++)
         {
             //add Capture Available Bus events to the simulator
             readyQueue.add(new Event(TIME + PULSE, "CaptureBus"));
+            //add Consume Packet events to the simulator
+            readyQueue.add(new Event(TIME + PULSE, "ConsumePacket"));
         }
         
         //hold input buffer available for selection
@@ -230,8 +237,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                     //put the updated Capture Available Bus back in the event queue
                     readyQueue.add(current);
 
-                    //holds peek at the RouterPacket sequence number
-                    RouterPacket peekPacket; 
+                     
 
     //*******************************************************************
     //NEED TO USE THE APPROPIATE Random Distribution
@@ -254,7 +260,8 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                     }
     //?? implement, each buffer input, first packet     
     */                
-                    //ensure there's packet(s) in the selected input buffer, to be switched
+                    //ensure there's packet(s) in the selected input buffer, 
+                    //to be switched and there is packets in the factory
                     while(((peekPacket = (RouterPacket)inputBuffer[FROM].peek()) == null) && 
                            (NumberOfPacketsMoved < totalNumberOfPackets) &&
                            (pFactory.GetPacketsRemaining() > 0))
@@ -297,8 +304,18 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                     //remove the buffer already selected
                     bSelect.remove(idx);
 
-    //ensure there is available bus(es)
-    if((sFabric.GetAvailableBusCount() > 0) && (this.inputBuffer[FROM].size() > 0))
+                    //inputBuffer not empty and bus already active
+                    if((sFabric.GetBusActiveStatus(TO)) && (this.inputBuffer[FROM].size() > 0))
+                    {
+                        if(inputBuffer[FROM].size() > 0)
+                        {
+                            sFabric.Print(false, TO,inputBuffer[FROM].peek().GetSequenceNumber(),true,TIME);
+                        }
+                    }
+                    
+                    
+                    //ensure there is available bus(es)
+                    if((sFabric.GetAvailableBusCount() > 0) && (this.inputBuffer[FROM].size() > 0))
                     {                
                     //set the TO buffer, based on available buses
                     TO = sFabric.GetBusNumberInAvailableBus(st.nextInt(sFabric.GetAvailableBusCount()));
@@ -316,19 +333,13 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
 
     if(sFabric.SetBusActiveStatus(TO,FROM,peekPacket.GetSequenceNumber(),TIME) == true)
                         {
-    System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());                        
+//System.out.println("Time: "+ TIME +" SetACTIVE FROM: "+FROM+" TO: "+TO+" Sequence: "+peekPacket.GetSequenceNumber());                        
     //System.out.println("    Got Bus: "+(sFabric.GetRecentBus()+1)+"    for Packet#: "+sFabric.sequence);                    
+   
                             //add fabric switching events to the simulator
                             /*
                             * release the Bus used to send packet
                             */ 
-    /*
-                            if(sFabric instanceof Bus )
-                            {
-                                //always 1 bus
-                                bus = 0;
-                            }
-    */ 
                            //create release event
                            Event evt = new Event(TIME + sFabric.GetSpeed(), "FabricSwitching");
                            //set the bus release information
@@ -338,6 +349,9 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
 
                         }
                     }
+                    
+                    
+                    
                 }
                 else
                 {
@@ -347,7 +361,16 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                     readyQueue.add(current);
                 }
             }
-            
+            //checkevent for Consume Packet from output bus
+            else if (current.GetActionToBeTaken().compareToIgnoreCase("ConsumePacket") == 0)
+            {
+//**************************************************
+//NEED TO CONSUME ACCORDING TO DISTRIBUTION
+pConsumer.ConsumePackets(1, outputBuffer);
+//**************************************************
+                //update the next Consumption Bus events time
+                current.SetTicks(current.GetTicks()+PULSE);
+            }
             //checkevent for fabric switching
             else if (current.GetActionToBeTaken().compareToIgnoreCase("FabricSwitching") == 0)
             {
@@ -388,10 +411,12 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
                         //increment packets moved from INPUT to OUTPUT Buffer
                         NumberOfPacketsMoved += 1;
                     }
+/*                    
 System.out.println("Time: "+ TIME +"    Input["+(current.GetInputBuffer())+"]" +" = "
         +inputBuffer[current.GetInputBuffer()].size()+"    --> Output["
         +(current.GetOutputBuffer())+"]" + " = "
         + outputBuffer[current.GetOutputBuffer()].size()+"    PKT(S)-Moved:"+NumberOfPacketsMoved);                
+        * */
 //*******************************************************************
                     /*
 System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
@@ -403,7 +428,7 @@ System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
 System.out.println("Time: "+ TIME + "    Input["+(current.GetInputBuffer())+"]" +" = "+
         inputBuffer[current.GetInputBuffer()].size()+"    --> Output["+(current.GetOutputBuffer())+"]" 
         + " = "+ outputBuffer[current.GetOutputBuffer()].size()+"    <- Packet : "+
-        sFabric.GetCurrentPacketUsingTheBus(current.GetBus())); 
+        sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+"    PKT(S)-Moved:"+NumberOfPacketsMoved); 
         /*sFabric.GetCurrentPacketUsingTheBus(current.GetOutputBuffer())+
         "   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
         "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+" ->");
