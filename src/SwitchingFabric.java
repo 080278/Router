@@ -99,7 +99,7 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
     //get bus number in availableBuses LinkedList
     public int GetBusNumberInAvailableBus(int index)
     {
-        return (int)availableBuses.get(index);
+        return Integer.parseInt(availableBuses.get(index).toString());
     }
     
     //get if packet was moved successfully
