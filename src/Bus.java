@@ -71,7 +71,7 @@ public class Bus extends SwitchingFabric{
     }
     
     //set the Active status of the bus
-    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME)
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME, ConfigFile cfg)
     {
         //REMOVE IN CROSSBAR FABRIC TYPE
         //only one bus present in this fabric type, 
@@ -104,19 +104,25 @@ public class Bus extends SwitchingFabric{
                 //set the recently used bus
                 recentBus = busNumber;
                 
-Print(true, busNumber,packetSequence,true,TIME);   
+if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+{                
+    Print(true, busNumber,packetSequence,true,TIME); 
+}
                 //successfully controlled the bus
                 return true;
             }
         }
         
-Print(false, busNumber,packetSequence,true,TIME);   
+if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+{        
+    Print(false, busNumber,packetSequence,true,TIME);   
+}
         //was unable to control the bus
         return false;
     }
     
     //set the InActive status of the bus
-    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME)
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME, ConfigFile cfg)
     {
                 
         //REMOVE IN CROSSBAR FABRIC TYPE
@@ -147,13 +153,19 @@ Print(false, busNumber,packetSequence,true,TIME);
                 //no packet using the bus
                 sequence[0] = -1;
                 
-Print(true, busNumber,packetSequence,false,TIME); 
+if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+{                
+    Print(true, busNumber,packetSequence,false,TIME); 
+}
                 //successfully released the bus
                 return true;
             }
         }
         
-Print(false, busNumber,packetSequence,false,TIME);  
+if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+{        
+    Print(false, busNumber,packetSequence,false,TIME);  
+}
         //was unable to control the bus
         return false;
     }
@@ -196,7 +208,7 @@ Print(false, busNumber,packetSequence,false,TIME);
                 //System.out.println("    Bus: "+ (ActiveTO+1) +"   [Already InActive] Packet: "+sequence+"\n");        
         }
     }
-    
+/*    
     public static void main(String []args)
     {
         Queue<DatagramPacket> []input= new LinkedList[4];
@@ -248,5 +260,5 @@ Print(false, busNumber,packetSequence,false,TIME);
         tst.SetBusInActiveStatus(0,1,0000,0);
         tst.MovePacket(0, 2,999);
     }
-    
+*/    
 }

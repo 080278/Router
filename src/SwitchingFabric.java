@@ -35,9 +35,9 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     //moves a packet from input buffer to output buffer
     public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME);
     //attempt to Takes control of the Fabric Bus
-    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME);
+    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME, ConfigFile cfg);
     //attempt to Release control of the Fabric Bus
-    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME);
+    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME, ConfigFile cfg);
     //get the recent packet moved
     public abstract RouterPacket GetRecentPacket();
     //get the recent bus used moved
@@ -137,6 +137,17 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
     public int GetCurrentPacketUsingTheBus(int busNumber)
     {
         return sequence[busNumber];
+    }
+    
+    //get if packet sequence using a Bus
+    public boolean GetSearchIfSequenceUsingTheBus(int sequence)
+    {
+        for(int seq:this.sequence)
+        {
+            if (seq == sequence)
+                return true;
+        }
+        return false;
     }
     
     //get the speed of the fabric

@@ -58,7 +58,7 @@ public class Memory extends SwitchingFabric{
 
     }
     //attempt to Takes control of the Fabric Bus
-    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME)
+    public boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME, ConfigFile cfg)
     {
         //only one bus present in this fabric type, 
         busNumber = 0;
@@ -89,7 +89,7 @@ public class Memory extends SwitchingFabric{
         return false;
     }
     //attempt to Release control of the Fabric Bus
-    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME)
+    public boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int packetSequence, int TIME, ConfigFile cfg)
     {
          //only one bus present in this fabric type, 
         busNumber = 0;

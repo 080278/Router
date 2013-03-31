@@ -136,7 +136,7 @@ public class PacketFactory
 
 //*****************************************************************************    
     //deliver packet to simulator input buffer
-    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer, ConfigFile cfg)
+    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer, ConfigFile cfg, int TIME)
     {
         //input buffer number
         int bufferNumber = 0;
@@ -174,8 +174,19 @@ for(int y=0;y<inputBuffer.length;y++)
                 //ensure that the Input Buffer limit(s) are obeyed
                 if(((inputBuffer[y].size() + 1) <= limit) && (packetsDelivered < totalNumberOfPackets))
                 {
+                    //get packet in the created buffer
+                    RouterPacket rP = GetPacketCreated();
+                    //set the time the packet is delivery to the simulation inputBuffer
+                    rP.SetTimeCreated(TIME);
+                    
                     //put packet in the input buffer 
-                    inputBuffer[y].add(GetPacketCreated());
+                    inputBuffer[y].add(rP);
+                    
+                    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                    { 
+                        System.out.println("Time: "+TIME+"    <INPUT><ARRIVED>    Packet: "+(packetsDelivered+1)+
+                                "    InputBuffer: "+ (y+1));
+                    }
                     //count number of packets delivered
                     packetsDelivered += 1;
                 }

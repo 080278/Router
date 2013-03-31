@@ -33,6 +33,12 @@ public class RouterPacket{
         return timeCreated;
     }
     
+    //set the time created
+    public void SetTimeCreated(int timeCreated)
+    {
+        this.timeCreated = timeCreated;
+    }
+    
     //set the time delivered
     public void SetTimeDelivered(int timeDelivered)
     {

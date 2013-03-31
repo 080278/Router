@@ -6,9 +6,9 @@ public interface InterfaceFabric {
     //moves a packet from input buffer to output buffer
     public abstract int MovePacket(int inputBufferNumber, int outputBufferNumber, int TIME);
     //attempt to Takes control of the Fabric Bus
-    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME);
+    public abstract boolean SetBusActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME, ConfigFile cfg);
     //attempt to Release control of the Fabric Bus
-    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME);
+    public abstract boolean SetBusInActiveStatus(int busNumber, int inputBufferNumber, int sequence, int TIME, ConfigFile cfg);
     //get the recent packet moved
     public abstract RouterPacket GetRecentPacket();
     //get the recent bus used
