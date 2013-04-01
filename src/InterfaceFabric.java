@@ -15,4 +15,5 @@ public interface InterfaceFabric {
     public abstract int GetRecentBus();
     //print status of the fabric
     public abstract void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME);
+    
 }   

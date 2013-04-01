@@ -22,6 +22,9 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     protected LinkedList availableBuses;
     //holds a list of inputBuffers using fabric bus
     protected LinkedList inputConnectedToBus;
+    //indicate if fabric has packet holding capabilities
+    protected boolean hasMemory;
+    
 //********************************************************************
 //NEED TO MODIFY FOR MULTIPLE BUSES IN THE CROSS BAR FABRIC    
 //IMPLEMENT USING ARRAY(S)    
@@ -44,6 +47,7 @@ public abstract class SwitchingFabric implements InterfaceFabric{
     public abstract int GetRecentBus();
     //print status of the fabric
     public abstract void Print(boolean result, int ActiveTO, int sequence, boolean active,int TIME);
+    
     
     //constructor
     public SwitchingFabric(int speed, Queue []inputBuffers, Queue []outputBuffers, int VERTICALBUSES)
@@ -82,6 +86,14 @@ currentInputBufferUsingTheBus = new int[outputBuffers.length];
             //initialize each vertical bus to available
             availableBuses.add(x);
         }
+    }
+    
+    
+    
+    //indicate if fabric has packet holding capabilities
+    public boolean GetHasMemory()
+    {
+        return hasMemory;
     }
     
     //get input connection status

@@ -19,6 +19,8 @@ public class Crossbar extends SwitchingFabric{
         //VERTICALBUSES are the number of 'OutputBuffers.length'
         //passes the constructor values to the base class SwitchingFabric
         super(speed, inputBuffers, outputBuffers, outputBuffers.length);
+        //indicate has no memory
+        hasMemory = false;
         //set the default recent bus
         recentBus = 0;
     }
@@ -38,7 +40,7 @@ public class Crossbar extends SwitchingFabric{
         RouterPacket peekPacket = (RouterPacket)inputBuffers[inputBufferNumber].peek();
         
         //esure there is a packet to move, packet activate bus successfully,bus becomes active 
-        if((peekPacket != null) && (sequence[outputBufferNumber] == peekPacket.GetSequenceNumber()) && 
+        if((peekPacket != null) && (sequence[peekPacket.GetBus()] == peekPacket.GetSequenceNumber()) && 
            (GetBusActiveStatus(recentBus)== true))
         {
             //ensure there is packet in the buffer
@@ -108,6 +110,9 @@ public class Crossbar extends SwitchingFabric{
                 
                 //keep track of the packet sequence using the bus
                 sequence[busNumber] = packetSequence;
+                
+                //set the bus to be used
+                ((RouterPacket)inputBuffers[inputBufferNumber].peek()).SetBus(busNumber);
                 
                 //set the recently used bus
                 recentBus = busNumber;

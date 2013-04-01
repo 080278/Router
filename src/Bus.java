@@ -18,8 +18,11 @@ public class Bus extends SwitchingFabric{
     //constructor
     public Bus(int speed, Queue []inputBuffers, Queue []outputBuffers)
     {
+        
         //passes the constructor values to the base class SwitchingFabric
         super(speed, inputBuffers, outputBuffers, VERTICALBUSES);
+        //indicate has no memory
+        hasMemory = false;
         //set the recent bus, because it never changes for this fabric type
         recentBus = 0;
     }

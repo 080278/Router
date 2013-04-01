@@ -15,6 +15,12 @@ public class RouterPacket{
     private int timeCreated;
     //holds the time delivered to OUTPUT
     private int timeDelivered;
+    //holds the destination buffer
+    private int outputBuffer;
+    //holds the source buffer
+    private int inputBuffer;
+    //holds the bus to be used
+    private int bus;
     
     //constructor
     public RouterPacket(byte[] buf, int length, InetAddress address, int port, int time, int sequence)
@@ -25,6 +31,42 @@ public class RouterPacket{
         timeCreated = time;
         //create the packet
         dPacket = new DatagramPacket(buf,length,address,port);
+    }
+    
+    //set the bus to be used
+    public void SetBus(int bus)
+    {
+        this.bus = bus;
+    }
+    
+    //get the bus to be used
+    public int GetBus()
+    {
+        return bus;
+    }
+    
+    //set the input buffer number
+    public void SetInputBuffer(int inputBuffer)
+    {
+        this.inputBuffer = inputBuffer;
+    }
+    
+    //get the input buffer number
+    public int GetInputBuffer()
+    {
+        return inputBuffer;
+    }
+    
+    //set the output buffer number
+    public void SetOutputBuffer(int outputBuffer)
+    {
+        this.outputBuffer = outputBuffer;
+    }
+    
+    //get the output buffer number
+    public int GetOutputBuffer()
+    {
+        return outputBuffer;
     }
     
     //get the time created
