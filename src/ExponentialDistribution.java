@@ -101,7 +101,7 @@ public class ExponentialDistribution extends Distribution
     public static void main(String[] args)
     {
         int NumberOfTimesPacketsAreDeliverd = 25;
-        int NumberOfPackets = 250;
+        int NumberOfPackets = 50;
         
         System.out.println("Packets arrival distributions: ");
             ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
