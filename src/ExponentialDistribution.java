@@ -7,11 +7,16 @@ import java.util.Random;
 import java.util.*;
 public class ExponentialDistribution extends Distribution
 {
+//******************************************    
+    //number of packets
+    private int NumberOfPackets;
+//******************************************
+    
     //create random object
     Random rand = new Random();
     
-    //create normal distribution array
-   int[] EDarray = new int[1000];
+    //create distribution array
+   int[] EDarray;
    
    private Queue q;
            
@@ -21,12 +26,14 @@ public class ExponentialDistribution extends Distribution
         
         super(inputbuffersize);
         q=new LinkedList();
-        getExponentialDistribution(mean());
+        
     }
     
+    
         
-        public int[] getExponentialDistribution(double mean) 
+        public int[] getExponentialDistribution() 
         {
+            double mean = this.mean();
             int[] a =new int[inputbuffersize];
              int val;
             for (int i=0;i<EDarray.length;i++)
@@ -40,18 +47,34 @@ public class ExponentialDistribution extends Distribution
                 
               //  System.out.print(EDarray[i]+ " ");  
             }
-            for(int x:a)   
-            System.out.println(x);
-            q.addAll(Arrays.asList(a));
+            for(int x:a)  
+            {
+                System.out.println(x);
+                q.add(x);
+                        
+            }
+            System.out.println("<E N D>\n");
+            /*
+            List lst = Arrays.asList(a);
+            q.addAll(lst);
+            */
+            
             return EDarray;
         } 
      
+        //set the number of packets
+        public void SetNumebrOfPackets(int packets)
+        {
+            NumberOfPackets = packets;
+            EDarray = new int[NumberOfPackets];
+        }
+        
         public int getNumber()
         {
             int value=0;
             if (q.size() > 0)
             {
-                value=(Integer)q.remove();
+                value = (Integer)q.remove();
             }
             
             return value;
@@ -77,9 +100,20 @@ public class ExponentialDistribution extends Distribution
    
     public static void main(String[] args)
     {
-            ExponentialDistribution arrivalAmounts= new ExponentialDistribution(10);    
+        int NumberOfTimesPacketsAreDeliverd = 25;
+        int NumberOfPackets = 250;
+        
+        System.out.println("Packets arrival distributions: ");
+            ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
             
-             ExponentialDistribution arrivalPattern= new ExponentialDistribution(arrivalAmounts.getNumber());  
-             arrivalPattern.print();
+            arrivalAmounts.SetNumebrOfPackets(NumberOfPackets);
+            arrivalAmounts.getExponentialDistribution();
+/*            
+        System.out.println("Arrival Patterns");
+            int num = arrivalAmounts.getNumber();
+            ExponentialDistribution arrivalPattern= new ExponentialDistribution(num);  
+        //System.out.println("port");
+            arrivalPattern.print();
+            */
     }
 }
