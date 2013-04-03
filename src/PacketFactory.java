@@ -153,7 +153,7 @@ public class PacketFactory
         }
 
 //***************************************************************        
-//NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPIATELY  
+//NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPRIATELY  
 for(int y=0;y<inputBuffer.length;y++)
     for(int x=0;x<1;x++)
             {
