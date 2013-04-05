@@ -18,8 +18,18 @@ public class Router {
     
     //holds the input buffer(s) queue
     private Queue<RouterPacket> []inputBuffer;
+    //holds the input BUFFER statistics
+        private double []inDelivery;
+        private double []inFull;
+        private double []inEmpty;
+        private double []inAvgPkts;
     //holds the output buffer(s) queue
     private Queue<RouterPacket> []outputBuffer;
+    //holds the output BUFFER statistics
+        private double []outDelivery;
+        private double []outFull;
+        private double []outEmpty;
+        private double []outAvgPkts;
     //holds the number of input buffers
     private final int INPUTBUFFERS;
     //holds the number of output buffers
@@ -80,16 +90,31 @@ public class Router {
         this.INPUTBUFFERS = (Integer)cfg.GetConfig("BUFFERS", "input");
         //save the number of output buffers
         this.OUTPUTBUFFERS = (Integer)cfg.GetConfig("BUFFERS", "output");
+        
+        
+        
         //initialize the input buffers
         inputBuffer = new LinkedList[this.INPUTBUFFERS];
+            inDelivery = new double[INPUTBUFFERS];
+            inFull = new double[INPUTBUFFERS];
+            inEmpty = new double[INPUTBUFFERS];
+            inAvgPkts = new double[INPUTBUFFERS];
         //initialize the output buffers
         outputBuffer = new LinkedList[this.OUTPUTBUFFERS];
-        
+            outDelivery = new double[OUTPUTBUFFERS];
+            outFull = new double[OUTPUTBUFFERS];
+            outEmpty = new double[OUTPUTBUFFERS];
+            outAvgPkts = new double[OUTPUTBUFFERS];
         //interate all buffers
         for(int x=0; x<INPUTBUFFERS; x++)
         {
             //initialize each input buffer
             inputBuffer[x] = new LinkedList();
+            //initialize statistics
+                inDelivery[x] = 0;
+                inFull[x] = 0;
+                inEmpty[x] = 0;
+                inAvgPkts[x] = 0;
         }
         
         //interate all buffers
@@ -97,6 +122,11 @@ public class Router {
         {
             //initialize each output buffer
             outputBuffer[x] = new LinkedList();
+            //initialize statistics
+                outDelivery[x] = 0;
+                outFull[x] = 0;
+                outEmpty[x] = 0;
+                outAvgPkts[x] = 0;
         }
         
         //calls the method to configure the simulator
@@ -490,7 +520,11 @@ else if(inputType == 1)
         if(inputType == 0)
             System.out.println("Time: "+ TIME +"    SetACTIVE  FROM input: "+(FROM+1)+" TO output: "+(TO+1)+" Sequence: "+peekPacket.GetSequenceNumber());                        
         else
-            System.out.println("Time: "+ TIME +"    SetACTIVE  FROM input: "+(FROM+1)+" TO output: "+(TO+1)+" Sequence: "+((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber());                        
+            System.out.println("Time: "+ TIME +"    SetACTIVE  FROM input: "+(FROM+1)+" TO output: "+
+                              (((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetOutputBuffer()+1)+
+                              " Sequence: "+
+                              ((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber());                        
+            //System.out.println("Time: "+ TIME +"    SetACTIVE  FROM input: "+(FROM+1)+" TO output: "+(TO+1)+" Sequence: "+((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber());                        
     }
     //System.out.println("    Got Bus: "+(sFabric.GetRecentBus()+1)+"    for Packet#: "+sFabric.sequence);                    
                                     Event evt;
@@ -506,10 +540,15 @@ else if(inputType == 1)
                                         //create InternalMemory packet movement event
                                         evt = new Event(TIME + sFabric.GetSpeed(), "InternalMemory");
                                         //set the bus release information
+                                        evt.SetBusReleaseInfo(((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetOutputBuffer(),
+                                            FROM, 
+                                            ((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber(),
+                                            BUS);
+                                        /*
                                         evt.SetBusReleaseInfo(TO, FROM, 
                                             ((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber(),
                                             BUS);
-                                        
+                                        */
                                         
                                    }
                                    /*
@@ -575,6 +614,9 @@ pConsumer.ConsumePackets(TIME,1, outputBuffer,cfg);
                                 (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("Default") ));
                 }
 
+                //gather how many times a delivery attempt was made
+                outDelivery[current.GetOutputBuffer()] += 1;
+                
                 //ensure that the Output Buffer limit(s) are obeyed
                 if((outputBuffer[current.GetOutputBuffer()].size() + 1) <= limit)
                 {
@@ -601,7 +643,9 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
             //"    --> Output["+(current.GetOutputBuffer()+1)+"]" +
             //" = "+ outputBuffer[current.GetOutputBuffer()].size()+
             "   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
-            "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()); 
+            "   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()
++ "   InternalMemory = "+((Memory)sFabric).GetInternalMemorySize()+" Pkt(s)"            
+            ); 
             //+"    PKT(S)-Moved:"+NumberOfPacketsMoved); 
 }
                             /*
@@ -626,6 +670,13 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
                         {
                             //increment packets moved from INPUT to OUTPUT Buffer
                             NumberOfPacketsMoved += 1;
+                            
+                            //check if it is the only packet in the output buffer
+                            if(outputBuffer[current.GetOutputBuffer()].size() == 1)
+                            {
+                                //gather how many times the buffer was empty
+                                outEmpty[current.GetOutputBuffer()] += 1;
+                            }
                         }
 /*                    
 System.out.println("Time: "+ TIME +"    Input["+(current.GetInputBuffer())+"]" +" = "
@@ -675,6 +726,9 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
                 }
                 else
                 {
+                    //gather how many times the buffer was full
+                    outFull[current.GetOutputBuffer()] += 1;
+                
 if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
 System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer()+1)+"]" + " = "+ 
@@ -707,6 +761,7 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
                 //put the event in the ready queue
                 readyQueue.add(evt);
                     
+                
                 }
                 
                 
@@ -753,6 +808,13 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
                         //increment packets moved from INPUT to OUTPUT Buffer
                         NumberOfPacketsMoved += 1;
                     
+                        //check if it is the only packet in the output buffer
+                        if(outputBuffer[current.GetOutputBuffer()].size() == 1)
+                        {
+                            //gather how many times the buffer was empty
+                            outEmpty[current.GetOutputBuffer()] += 1;
+                        }
+                        
 
                         if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
                         {                    
@@ -801,6 +863,7 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
             }
         }
         
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
         
         System.out.println("\n\n\n                          S U M M A R Y\n");
         
@@ -816,13 +879,28 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
         }
         
         System.out.println("\n\n*** <OUTPUT> Buffers ***");
+        String empty;
+        String full;
         for(int x=0; x<OUTPUTBUFFERS;x++)
         {
+            if(outDelivery[x] == 0)
+            {
+                empty = "0";
+                full = "0";
+            }
+            else
+            {
+                empty = df.format(((outEmpty[x]/outDelivery[x])*100));
+                full = df.format(((outFull[x]/outDelivery[x])*100));
+            }        
+            
+            
             System.out.println();
-            System.out.println("Output Buffer["+(x+1)+"] Percentage Empty           = ");
-            System.out.println("Output Buffer["+(x+1)+"] Percentage Full            = ");
+            System.out.println("Output Buffer["+(x+1)+"] Percentage Empty           = "+outEmpty[x]+"/"+outDelivery[x]+" = "+empty+"%");
+            System.out.println("Output Buffer["+(x+1)+"] Percentage Full            = "+outFull[x]+"/"+outDelivery[x]+" = "+full+"%");
             System.out.println("Output Buffer["+(x+1)+"] Average Number of pkt(s)   = ");
         }
+        
     }
     
     public static void main(String[] args) {
