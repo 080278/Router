@@ -5,6 +5,7 @@ import java.util.Random;
  * implements the Exponential distribution
  */
 import java.util.*;
+
 public class ExponentialDistribution extends Distribution
 {
 //******************************************    
@@ -30,10 +31,10 @@ public class ExponentialDistribution extends Distribution
     }
     
     
-        
-        public int[] getExponentialDistribution() 
+        @Override
+        public int getDistribution(double mean,double standardDeviation) 
         {
-            double mean = this.mean();
+            mean = this.mean();
             int[] a =new int[inputbuffersize];
              int val;
             for (int i=0;i<EDarray.length;i++)
@@ -59,7 +60,7 @@ public class ExponentialDistribution extends Distribution
             q.addAll(lst);
             */
             
-            return EDarray;
+            return -1;//return EDarray;
         } 
      
         //set the number of packets
@@ -107,7 +108,7 @@ public class ExponentialDistribution extends Distribution
             ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
             
             arrivalAmounts.SetNumebrOfPackets(NumberOfPackets);
-            arrivalAmounts.getExponentialDistribution();
+            arrivalAmounts.getDistribution(6.5,1.5);
 /*            
         System.out.println("Arrival Patterns");
             int num = arrivalAmounts.getNumber();

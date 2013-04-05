@@ -1,52 +1,41 @@
  /*
  * implements the Normal Distribution using Java's Gaussian provision
- * double value = rng.nextGaussian() * sd + mean;
+ * Implementation culled from the org.apache.commons libraries
  */
 import java.util.*;
+
 public class NormalDistribution extends Distribution
 {
-    
-    //create random object
-    Random rand = new Random();
-    
-    //create normal distribution array
-   int[] NDarray = new int[1000];
-    
-    public NormalDistribution(int inputbuffersize)
+     //create normal distribution array
+     int[] NDarray = new int[1000];
+  
+   //Constructor for normal distribution
+    public NormalDistribution(double mean,double standardDeviation)
     {
-        super(inputbuffersize);
+        super(mean, standardDeviation);
+        getDistribution(15.5,0.5);
     }
     
-    public int[] getNormalDistribution()
-    { 
-        int val;
-        for (int i=0;i<NDarray.length;i++)
+ 
+    //NormalDistribution takes parameters: mean, standard deviation and uses the Random's gaussian method
+    @Override
+    public int getDistribution(double mean, double standardDeviation)
+    {    
+        for (int i=0;i<10;i++)
         {
-            val = (int) Math.round(rand.nextGaussian());
-            if (val >=0 && val<=inputbuffersize)
-            {
-                 
-                 NDarray[i]=val;
-            }
-                
-             System.out.println(NDarray[i]+ " ");
-        }     
-        return NDarray; 
-    }
-    
-   public int mean() 
-   {
-        double sum = 0;
-        for (int i = 0; i < inputbuffersize-1 ; i++) 
-        {
-            sum=sum+i;
+            int val = (int) (mean + standardDeviation * rand.nextGaussian());
+            System.out.println(val);
         }
-    return (int)Math.round(sum / inputbuffersize);
-   }
+        return -1;
+    }
+    
+   
     public static void main(String[] args)
     {
-        NormalDistribution arrivalAmounts= new NormalDistribution(10);
-        arrivalAmounts.getNormalDistribution();
+       
+        NormalDistribution arrivalAmounts= new NormalDistribution(15.5,0.5);
+        
+        //arrivalAmounts.getNormalDistribution();
         
         
         
