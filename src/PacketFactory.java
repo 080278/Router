@@ -202,6 +202,10 @@ for(int y=0;y<inputBuffer.length;y++)
                         //gather how many times the buffer was empty
                         router.inEmpty[y] += 1;
                     }
+                    
+                    //input average packets  
+                    router.inAvgPkts[y] += inputBuffer[y].size();
+                    router.inAvgPkts[y] /=2;
                 }
                 else if((inputBuffer[y].size() + 1) > limit)
                 {

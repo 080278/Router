@@ -683,6 +683,10 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
                                 //gather how many times the buffer was empty
                                 outEmpty[current.GetOutputBuffer()] += 1;
                             }
+                            
+                            //output average packets  
+                            outAvgPkts[current.GetOutputBuffer()] += outputBuffer[current.GetOutputBuffer()].size();
+                            outAvgPkts[current.GetOutputBuffer()] /=2;
                         }
 /*                    
 System.out.println("Time: "+ TIME +"    Input["+(current.GetInputBuffer())+"]" +" = "
@@ -821,6 +825,9 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
                             outEmpty[current.GetOutputBuffer()] += 1;
                         }
                         
+                        //output average packets  
+                        outAvgPkts[current.GetOutputBuffer()] += outputBuffer[current.GetOutputBuffer()].size();
+                        outAvgPkts[current.GetOutputBuffer()] /=2;
 
                         if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
                         {                    
@@ -893,7 +900,7 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
             System.out.println();
             System.out.println("Input  Buffer["+(x+1)+"] Percentage Empty           = "+inEmpty[x]+"/"+inDelivery[x]+" = "+empty+"%");
             System.out.println("Input  Buffer["+(x+1)+"] Percentage Full            = "+inFull[x]+"/"+inDelivery[x]+" = "+full+"%");
-            System.out.println("Input  Buffer["+(x+1)+"] Average Number of pkt(s)   = ");
+            System.out.println("Input  Buffer["+(x+1)+"] Average Number of pkt(s)   = "+inAvgPkts[x]);
         }
         
         System.out.println("\n\n*** <OUTPUT> Buffers ***");
@@ -915,7 +922,7 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
             System.out.println();
             System.out.println("Output Buffer["+(x+1)+"] Percentage Empty           = "+outEmpty[x]+"/"+outDelivery[x]+" = "+empty+"%");
             System.out.println("Output Buffer["+(x+1)+"] Percentage Full            = "+outFull[x]+"/"+outDelivery[x]+" = "+full+"%");
-            System.out.println("Output Buffer["+(x+1)+"] Average Number of pkt(s)   = ");
+            System.out.println("Output Buffer["+(x+1)+"] Average Number of pkt(s)   = "+outAvgPkts[x]);
         }
         
     }
