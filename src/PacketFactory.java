@@ -155,7 +155,7 @@ public class PacketFactory
 //***************************************************************        
 //NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPRIATELY  
 for(int y=0;y<inputBuffer.length;y++)
-    for(int x=0;x<1;x++)
+    for(int x=0;x<10;x++)
             {
                 //size limit of the Input buffer
                 int limit;

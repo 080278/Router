@@ -34,7 +34,7 @@ public class ConfigFile {
         try
         {
             //open the file input stream
-            FileInputStream inStream = new FileInputStream(System.getProperty("user.dir")+"\\ConfigFile.cfg");
+            FileInputStream inStream = new FileInputStream(System.getProperty("user.dir")+"/ConfigFile.cfg");
             //get the data stream for the file
             DataInputStream in = new DataInputStream(inStream);
             //read data from the file
