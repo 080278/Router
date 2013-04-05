@@ -19,10 +19,10 @@ public class Router {
     //holds the input buffer(s) queue
     private Queue<RouterPacket> []inputBuffer;
     //holds the input BUFFER statistics
-        private double []inDelivery;
-        private double []inFull;
-        private double []inEmpty;
-        private double []inAvgPkts;
+        double []inDelivery;
+        double []inFull;
+        double []inEmpty;
+        double []inAvgPkts;
     //holds the output buffer(s) queue
     private Queue<RouterPacket> []outputBuffer;
     //holds the output BUFFER statistics
@@ -136,6 +136,12 @@ public class Router {
         RunSimulator();
     }
 
+    //get size of the input buffer
+    public Queue<RouterPacket>[] GetInputBuffer()
+    {
+        return inputBuffer;
+    }
+    
     //return simulation time
     public int GetTime()
     {
@@ -399,7 +405,7 @@ else if(inputType == 1)
         //*************************                    
         //NEED TO ALLOCATE PROPERLY                    
         //puts 1024 packets in the the Input Buffers, every time                
-        pFactory.DeliverPacket(1, inputBuffer, cfg, TIME);
+        pFactory.DeliverPacket(1, inputBuffer, cfg, TIME,this);
         //*************************
 
         //***********************************************************
@@ -864,6 +870,8 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
         }
         
         java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
+        String empty;
+        String full;
         
         System.out.println("\n\n\n                          S U M M A R Y\n");
         
@@ -872,15 +880,24 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
         System.out.println("\n\n*** <INPUT> Buffers ***");
         for(int x=0; x<INPUTBUFFERS;x++)
         {
+            if(inDelivery[x] == 0)
+            {
+                empty = "0";
+                full = "0";
+            }
+            else
+            {
+                empty = df.format(((inEmpty[x]/inDelivery[x])*100));
+                full = df.format(((inFull[x]/inDelivery[x])*100));
+            } 
             System.out.println();
-            System.out.println("Input  Buffer["+(x+1)+"] Percentage Empty           = ");
-            System.out.println("Input  Buffer["+(x+1)+"] Percentage Full            = ");
+            System.out.println("Input  Buffer["+(x+1)+"] Percentage Empty           = "+inEmpty[x]+"/"+inDelivery[x]+" = "+empty+"%");
+            System.out.println("Input  Buffer["+(x+1)+"] Percentage Full            = "+inFull[x]+"/"+inDelivery[x]+" = "+full+"%");
             System.out.println("Input  Buffer["+(x+1)+"] Average Number of pkt(s)   = ");
         }
         
         System.out.println("\n\n*** <OUTPUT> Buffers ***");
-        String empty;
-        String full;
+        
         for(int x=0; x<OUTPUTBUFFERS;x++)
         {
             if(outDelivery[x] == 0)

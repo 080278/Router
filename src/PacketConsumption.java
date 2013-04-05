@@ -72,7 +72,7 @@ public class PacketConsumption
                 RouterPacket rp = (RouterPacket)outputBuffer[bufferNumber].remove();
                 if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
                 {
-                    System.out.println("Time: "+TIME+"    <REMOVED> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
+                    System.out.println("Time: "+TIME+"    <CONSUMED> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
                 }
             }
             catch(Exception e)

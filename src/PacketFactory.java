@@ -136,7 +136,7 @@ public class PacketFactory
 
 //*****************************************************************************    
     //deliver packet to simulator input buffer
-    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer, ConfigFile cfg, int TIME)
+    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer, ConfigFile cfg, int TIME, Router router)
     {
         //input buffer number
         int bufferNumber = 0;
@@ -171,6 +171,12 @@ for(int y=0;y<inputBuffer.length;y++)
                     limit = (Integer)cfg.GetConfig("CLASS",
                                 (String)cfg.GetConfig("INPUTBUFFERSCLASS", ("Default") ));
                 }
+                
+                
+                
+                //gather how many times a delivery attempt was made
+                router.inDelivery[y] += 1;
+                
                 //ensure that the Input Buffer limit(s) are obeyed
                 if(((inputBuffer[y].size() + 1) <= limit) && (packetsDelivered < totalNumberOfPackets))
                 {
@@ -189,6 +195,26 @@ for(int y=0;y<inputBuffer.length;y++)
                     }
                     //count number of packets delivered
                     packetsDelivered += 1;
+                    
+                    //check if it is the only packet in the input buffer
+                    if(inputBuffer[y].size() == 1)
+                    {
+                        //gather how many times the buffer was empty
+                        router.inEmpty[y] += 1;
+                    }
+                }
+                else if((inputBuffer[y].size() + 1) > limit)
+                {
+                    //gather how many times the buffer was full
+                    router.inFull[y] += 1;
+                    
+                    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+{                    
+System.out.println("\nTime: "+ TIME + "    --> Input["+(y+1)+"]" + " = "+ 
+        inputBuffer[y].size()+"    Packet(s)"+ "    Cannot deliver Packet"+
+        "    --> Input["+(y+1)+"]" +" -> F U L L\n");                    
+}
+                    break;
                 }
                 else
                 {
