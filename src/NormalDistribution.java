@@ -6,20 +6,30 @@ import java.util.*;
 
 public class NormalDistribution extends Distribution
 {
+    
+    //number of packets
+    private int NumberOfPackets;
+//******************************************    
+    //distribution mean
+    private double mean;
+    
+    private Queue q;
+//******************************************
+    
      //create normal distribution array
-     int[] NDarray = new int[1000];
+     int[] NDarray; // = new int[1000];
   
    //Constructor for normal distribution
     public NormalDistribution(double mean,double standardDeviation)
     {
         super(mean, standardDeviation);
-        getDistribution(15.5,0.5);
+        getDistribution(0.5);
     }
     
  
     //NormalDistribution takes parameters: mean, standard deviation and uses the Random's gaussian method
     @Override
-    public int getDistribution(double mean, double standardDeviation)
+    public int getDistribution(double standardDeviation)
     {    
         for (int i=0;i<10;i++)
         {
@@ -29,6 +39,37 @@ public class NormalDistribution extends Distribution
         return -1;
     }
     
+    //************************
+        //set the number of packets
+        public void SetNumebrOfPackets(int packets)
+        {
+            NumberOfPackets = packets;
+            NDarray = new int[NumberOfPackets];
+        }
+        
+        public int getNumber()
+        {
+            int value=0;
+            if (q.size() > 0)
+            {
+                value = (Integer)q.remove();
+            }
+            
+            return value;
+            
+        }
+        
+        public void remove()
+        {
+            q.clear();
+        }
+        
+        //set the mean of the distribution
+        public void SetMean(double mean)
+        {
+            this.mean = mean;
+        }
+        //************************
    
     public static void main(String[] args)
     {

@@ -40,7 +40,7 @@ public abstract class Distribution
        {
               return standardDeviation;
        }
-    
+    /*
         //set the mean
        public void setMean(int mean)
        {
@@ -52,6 +52,11 @@ public abstract class Distribution
        {
           return mean;
        }
-       
-    public abstract int getDistribution(double mean,double standardDeviation);
+       */
+    //public abstract int getDistribution(double mean,double standardDeviation);
+    public abstract int getDistribution(double standardDeviation);
+    public abstract void SetMean(double mean);
+    public abstract void SetNumebrOfPackets(int packets);
+    public abstract void remove();
+    public abstract int getNumber();
 }
