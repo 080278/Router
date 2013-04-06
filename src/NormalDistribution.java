@@ -23,13 +23,15 @@ public class NormalDistribution extends Distribution
     public NormalDistribution(double mean,double standardDeviation)
     {
         super(mean, standardDeviation);
-        getDistribution(0.5);
+        //getDistribution(0.5);
+        //getDistribution();
     }
     
  
     //NormalDistribution takes parameters: mean, standard deviation and uses the Random's gaussian method
     @Override
-    public int getDistribution(double standardDeviation)
+    //public int getDistribution(double standardDeviation)
+    public int getDistribution()
     {    
         for (int i=0;i<10;i++)
         {
@@ -74,7 +76,7 @@ public class NormalDistribution extends Distribution
     public static void main(String[] args)
     {
        
-        NormalDistribution arrivalAmounts= new NormalDistribution(15.5,0.5);
+        NormalDistribution arrivalAmounts= new NormalDistribution(15,0.5);
         
         //arrivalAmounts.getNormalDistribution();
         

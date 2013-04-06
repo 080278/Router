@@ -54,7 +54,7 @@ public abstract class Distribution
        }
        */
     //public abstract int getDistribution(double mean,double standardDeviation);
-    public abstract int getDistribution(double standardDeviation);
+    public abstract int getDistribution();
     public abstract void SetMean(double mean);
     public abstract void SetNumebrOfPackets(int packets);
     public abstract void remove();

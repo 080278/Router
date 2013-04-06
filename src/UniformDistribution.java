@@ -8,9 +8,7 @@ public class UniformDistribution extends Distribution
     //number of packets
     private int NumberOfPackets;
 //******************************************    
-    //distribution mean
-    private double mean;
-    
+
     private Queue q;
 //******************************************
     
@@ -20,25 +18,26 @@ public class UniformDistribution extends Distribution
     //create normal distribution array
    int[] UDarray; // = new int[1000];
     
-   private int standardDeviation;
-   //private int mean;
-   
    
    //Uniform Distribution class constructor
     public  UniformDistribution(double mean,double standardDeviation)
     {
         super(mean, standardDeviation);
-        getDistribution(1.5);
+        //super.mean = mean;
+        //super.standardDeviation = standardDeviation;
+        //getDistribution(1.5);
+        //getDistribution();
     }
     
         @Override
-        public int getDistribution(double standardDeviation) 
+        //public int getDistribution(double standardDeviation) 
+        public int getDistribution() 
         {
-            for (int i=0;i<10;i++)
-            {
-                double value = (Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation);
-                System.out.println((int)value);
-            }
+            double value = -1;
+            
+            value = (Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation);
+                
+            System.out.println(value);
             return -1;
         } 
         
@@ -70,14 +69,33 @@ public class UniformDistribution extends Distribution
         //set the mean of the distribution
         public void SetMean(double mean)
         {
-            this.mean = mean;
+            super.mean = mean;
         }
         //************************
    
+        public void print()
+        {
+            while (q.size() != 0)
+            {
+                System.out.println(getNumber());
+            }
+        }
        
     public static void main(String[] args)
     {
-           UniformDistribution distribution= new UniformDistribution(4.5,1.5);
+        //int NumberOfTimesPacketsAreDeliverd = 0;
+        int NumberOfPackets = 100;
+        //*************************
+        double mean = 4.5;//2.9;
+        double StandardDeviation = 1.5;
+        //*************************
+        
+           UniformDistribution distribution= new UniformDistribution(mean,StandardDeviation);
    
+           //**********************************
+            distribution.SetMean(mean);
+            //**********************************
+            distribution.SetNumebrOfPackets(NumberOfPackets);
+            distribution.getDistribution();
     }
 }

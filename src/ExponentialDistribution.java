@@ -11,11 +11,6 @@ public class ExponentialDistribution extends Distribution
     
     //number of packets
     private int NumberOfPackets;
-//******************************************    
-    //distribution mean
-    private double mean;
-//******************************************
-    
    //create random object
    Random rand = new Random();
     
@@ -26,10 +21,11 @@ public class ExponentialDistribution extends Distribution
    private Queue q;
            
    
-    public  ExponentialDistribution(int inputbuffersize)
+    public  ExponentialDistribution(int NumberOfTimesPacketsAreDeliverd)
     {
         
-        super(inputbuffersize);
+        super(NumberOfTimesPacketsAreDeliverd);
+        
         //initialize the distribution array 
         EDarray = new ArrayList();
         //initialize the queue for output
@@ -38,7 +34,8 @@ public class ExponentialDistribution extends Distribution
     
     
         @Override
-        public int getDistribution(double standardDeviation) 
+        //public int getDistribution(double standardDeviation) 
+        public int getDistribution() 
         {
             //*********************
             //mean = this.mean();
@@ -67,13 +64,14 @@ public class ExponentialDistribution extends Distribution
               //  System.out.print(EDarray[i]+ " ");  
             }
             
-            /*
+            
             for(Object x:EDarray)  
             {
-                System.out.println((int)x);
+                System.out.print((int)x+" ");
             }
-            System.out.println("-----------");
-            */
+            System.out.println("\n-----------");
+  
+
             
             
             
@@ -84,7 +82,7 @@ public class ExponentialDistribution extends Distribution
             for(int x:a)  
             //for(Object x:EDarray)  
             {
-                System.out.println(x);
+                System.out.print(x+" ");
                 q.add(x);
                 //***************
                 total += x;
@@ -92,7 +90,7 @@ public class ExponentialDistribution extends Distribution
             }
             
             //***************
-            System.out.println("<Total>: "+total);
+            System.out.println("\n<Total>: "+total);
             //***************
             System.out.println("<E N D>\n");
             /*
@@ -132,7 +130,7 @@ public class ExponentialDistribution extends Distribution
         //set the mean of the distribution
         public void SetMean(double mean)
         {
-            this.mean = mean;
+            super.mean = mean;
         }
         //************************
         
@@ -160,31 +158,36 @@ public class ExponentialDistribution extends Distribution
    
     public static void main(String[] args)
     {
-        //int NumberOfTimesPacketsAreDeliverd = 3;
-        int InputBufferSize = 2;
-        int NumberOfPackets = 25;
+        
+        
+        int NumberOfPackets = 15;
         //*************************
         double mean = 10;//2.9;
         //*************************
         
         System.out.println("Packets arrival distributions: ");
-            ExponentialDistribution arrivalAmounts= new ExponentialDistribution(InputBufferSize);
+            //for packet times delivery, seed to keep the same number
+            Random rnd = new Random();
+            int NumberOfTimesPacketsAreDeliverd = rnd.nextInt(NumberOfPackets);
+            //based on the number of packets, a random number is chosen for the 
+            //number of times packet delivery happens
+            ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
             
             //**********************************
             arrivalAmounts.SetMean(mean);
             //**********************************
             arrivalAmounts.SetNumebrOfPackets(NumberOfPackets);
-            arrivalAmounts.getDistribution(0);
+            arrivalAmounts.getDistribution();
             
             
         System.out.println("Arrival Patterns");
-            ExponentialDistribution arrivalPattern= new ExponentialDistribution(InputBufferSize);  
+            ExponentialDistribution arrivalPattern= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);  
             int packetAmt;
             while((packetAmt = arrivalAmounts.getNumber()) != -1)
             {
                 arrivalPattern.SetNumebrOfPackets(packetAmt);
                 arrivalPattern.SetMean(mean);
-                arrivalPattern.getDistribution(0);
+                arrivalPattern.getDistribution();
                 arrivalPattern.remove();
             }
 
