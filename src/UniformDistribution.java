@@ -29,6 +29,13 @@ public class UniformDistribution extends Distribution
         //getDistribution();
     }
     
+    //return the Queue holding the distribution
+        public Queue GetDistributionQueue()
+        {
+            return q;
+        }
+        
+    
         @Override
         //public int getDistribution(double standardDeviation) 
         public int getDistribution() 

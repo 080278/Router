@@ -155,7 +155,7 @@ public class PacketFactory
 //***************************************************************        
 //NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPRIATELY  
 for(int y=0;y<inputBuffer.length;y++)
-    for(int x=0;x<100;x++)
+    for(int x=0;x<1;x++)
             {
                 //size limit of the Input buffer
                 int limit;
@@ -211,6 +211,10 @@ for(int y=0;y<inputBuffer.length;y++)
                 {
                     //gather how many times the buffer was full
                     router.inFull[y] += 1;
+                    //how many packets in total dropped
+                    router.inputtotalDroppedPkts += 1;
+                    //gather how many times packets were dropped
+                    router.inDroppedPkts[y] += 1;
                     
                     if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
 {                    

@@ -28,6 +28,12 @@ public class NormalDistribution extends Distribution
     }
     
  
+    //return the Queue holding the distribution
+    public Queue GetDistributionQueue()
+    {
+        return q;
+    }
+        
     //NormalDistribution takes parameters: mean, standard deviation and uses the Random's gaussian method
     @Override
     //public int getDistribution(double standardDeviation)

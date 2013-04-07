@@ -1,8 +1,7 @@
 
 import java.net.InetAddress;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
+
 
 /*
  * To change this template, choose Tools | Templates
@@ -21,35 +20,149 @@ public class PacketConsumption
 {
 
     //holds the configuration file
-    ConfigFile cfg;
+    private ConfigFile cfg;
+    //holds the number of output buffers
+    private int OUTPUTBUFFERS;
+    //holds the consumption amounts per time for each output buffer
+    private Queue []timing;
+    //holds the distribution type
+    private Distribution dType;
     
-    public PacketConsumption(ConfigFile cfg)
+    public PacketConsumption(ConfigFile cfg, int OUTPUTBUFFERS)
     {
         
         //set the configuration file
         this.cfg = cfg;
+        //set the output buffers
+        this.OUTPUTBUFFERS = OUTPUTBUFFERS;
+        //create timing listing
+        timing = new Queue[OUTPUTBUFFERS];
     }
     
     
 //*****************************************************************************    
     //remove packets from simulation output buffer
-    public void ConsumePackets(int TIME, int rndType, Queue<RouterPacket> []outputBuffer, ConfigFile cfg)
+    public void ConsumePackets(int TIME, Queue<RouterPacket> []outputBuffer, long SEED, PriorityQueue<Event> pQ,int PULSE, Event current)
     {
+        //temporary hold the queue from distribution calculations
+        Queue tmp = null;
+      
         //holds the buffer to remove the packets from        
         int bufferNumber = -1;
+        //uniform random selection of outputBuffer
+        Random rnd = new Random();
         
-        switch(rndType)
-        {
-            case 1:
-//***************************************************************        
-//NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPIATELY                  
-                Random rnd = new Random();
-                //input buffer number
-                bufferNumber = rnd.nextInt(outputBuffer.length);
-            break;
-//***************************************************************        
-        }
+        //output buffer number selection
+        bufferNumber = rnd.nextInt(outputBuffer.length);
+//******************************************************
+//              DISTRIBUTION
 
+        int discard = 0;
+                
+        //holds the number of packet found in the buffer
+        int NumberOfPackets = outputBuffer[bufferNumber].size();
+        //holds the mean of the OUTPUT-DISTRIBUTION from the config file
+        double mean = Double.parseDouble(cfg.GetConfig("OUTPUT-DISTRIBUTION","Mean").toString());
+        //for packet times delivery, seed to keep the same number of the simulator
+        Random rnd1 = new Random(SEED);
+
+        //defaults to 1 unless packet count > 1
+        int NumberOfTimesPacketsAreDeliverd = 1;
+        //or else the random will be 0
+        if(NumberOfPackets > 0)
+        {
+            do{
+
+                //based on the number of packets in output buffer,
+                //a random number is chosen for the number of times packet delivery happens
+                NumberOfTimesPacketsAreDeliverd = rnd1.nextInt(NumberOfPackets+1);
+            }
+            while(NumberOfTimesPacketsAreDeliverd == 0);
+        
+
+//***************************************************************        
+//NEED TO USE THE DISTRIBUTION TYPE TO REMOVE PACKETS APPROPIATELY                  
+                
+            
+
+            //check if OUTPUT-DISTRIBUTION = Exponential
+            if(((String)cfg.GetConfig("OUTPUT-DISTRIBUTION","Type")).
+                    compareToIgnoreCase("Exponential") == 0)
+            {
+                //create class, set the number of time the packets are broken up
+                dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
+                //set the mean
+                dType.SetMean(mean);
+                //set how many packets present
+                dType.SetNumebrOfPackets(NumberOfPackets);
+                //get the distribution of the packets to remove
+                dType.getDistribution();
+
+                tmp = dType.GetDistributionQueue();
+                //ensure there is an entry of a distribution
+                //if((timing[bufferNumber] != null) && (tmp.size() > 0))
+                if(tmp.size() > 0)
+                {
+                    //check for null,distribution queue is empty of packet discard timings
+                    if(timing[bufferNumber] == null) 
+                    {
+                        timing[bufferNumber] = tmp;
+                    }
+                    else if(timing[bufferNumber].size() == 0)
+                    {
+                        timing[bufferNumber] = tmp;
+                    }
+                }
+            }
+        
+        
+        
+            if((timing[bufferNumber] != null) && (outputBuffer[bufferNumber].size() > 0))
+            {
+                try
+                {
+                    //remove a packet from the outputBuffers chosen at random
+                    RouterPacket rp = (RouterPacket)outputBuffer[bufferNumber].peek();
+                    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                    {
+                        System.out.println("Time: "+TIME+"    <Consuming> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
+                    }
+                }
+                catch(Exception e)
+                {
+                    //System.out.println("Time: "+TIME+"    NO packets to remove from OutputBuffer[ "+ bufferNumber + "]");
+                    //break;
+                }
+
+                //plus tick to discard the packet from the buffer
+                discard = (int)timing[bufferNumber].remove();
+
+                try
+                {
+                    //add 1 Discard Packet events to the simulator
+                    Event evt = new Event(TIME +discard+PULSE, "DiscardPacket");
+                    //get how many packets to discard
+                    int numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
+                        (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("buffer"+(bufferNumber+1)) ));
+                    
+                    evt.SetBusReleaseInfo(bufferNumber, 0, numberOfPacketsToDiscard, 0);
+                    pQ.add(evt);
+                }
+                catch(Exception e){}
+
+            
+    //*************************************************************** 
+            }
+        }
+          
+        //update the next Consumption Bus event time
+        current.SetTicks(TIME+discard+PULSE);
+        //put the updated Consumption Bus event back in the ready queue
+        pQ.add(current);
+        
+        
+        
+/*           
         
         int totalNumberOfPackets;
         try
@@ -81,6 +194,32 @@ public class PacketConsumption
                 break;
             }
         }
+*/        
     }
+    
+    public void DiscardPackets(int TIME, Queue<RouterPacket> []outputBuffer, int bufferNumber, Event current, PriorityQueue<Event> pQ)
+    {
+        //remove the amount of packets specified to be removed in the 
+        //CLASSCONSUMPTIONRATES section of the config file
+        for(int y=0;y<current.GetSequence();y++)
+        {
+            try
+            {
+                //remove a packet from the outputBuffers chosen at random
+                RouterPacket rp = (RouterPacket)outputBuffer[bufferNumber].remove();
+                if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                {
+                    System.out.println("Time: "+TIME+"    <DISCARD> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
+                }
+            }
+            catch(Exception e)
+            {
+                //System.out.println("Time: "+TIME+"    NO packets to remove from OutputBuffer[ "+ bufferNumber + "]");
+
+                //break;
+            }
+        }
         
+        
+    }
 }

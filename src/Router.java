@@ -11,11 +11,15 @@ public class Router {
     int TIME;
     //holds the tick interval an attempt to move a packet occurs
     int PULSE;
-    
+    //holds the SEED value
+    long SEED;
     
     //holds the ready queue
     private PriorityQueue<Event> readyQueue;
-    
+    //holds total input dropped packets
+    int inputtotalDroppedPkts;
+    //holds total output dropped packets
+    int outputtotalDroppedPkts;
     //holds the input buffer(s) queue
     private Queue<RouterPacket> []inputBuffer;
     //holds the input BUFFER statistics
@@ -23,6 +27,7 @@ public class Router {
         double []inFull;
         double []inEmpty;
         double []inAvgPkts;
+        int []inDroppedPkts;
     //holds the output buffer(s) queue
     private Queue<RouterPacket> []outputBuffer;
     //holds the output BUFFER statistics
@@ -30,6 +35,7 @@ public class Router {
         private double []outFull;
         private double []outEmpty;
         private double []outAvgPkts;
+        private int []outDroppedPkts;
     //holds the number of input buffers
     private final int INPUTBUFFERS;
     //holds the number of output buffers
@@ -65,6 +71,9 @@ public class Router {
     //public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed, int totalNumberOfPackets)
     public Router()
     {
+        //save the current time seed
+        SEED = System.currentTimeMillis();
+        
         //read the configuration file
         cfg = new ConfigFile();
         
@@ -99,12 +108,19 @@ public class Router {
             inFull = new double[INPUTBUFFERS];
             inEmpty = new double[INPUTBUFFERS];
             inAvgPkts = new double[INPUTBUFFERS];
+            inDroppedPkts = new int[INPUTBUFFERS];
         //initialize the output buffers
         outputBuffer = new LinkedList[this.OUTPUTBUFFERS];
             outDelivery = new double[OUTPUTBUFFERS];
             outFull = new double[OUTPUTBUFFERS];
             outEmpty = new double[OUTPUTBUFFERS];
             outAvgPkts = new double[OUTPUTBUFFERS];
+            outDroppedPkts = new int[OUTPUTBUFFERS];
+            
+        //initialize total input dropped packets
+        inputtotalDroppedPkts = 0;
+        //initialize total input dropped packets
+        outputtotalDroppedPkts = 0;
         //interate all buffers
         for(int x=0; x<INPUTBUFFERS; x++)
         {
@@ -115,6 +131,7 @@ public class Router {
                 inFull[x] = 0;
                 inEmpty[x] = 0;
                 inAvgPkts[x] = 0;
+                inDroppedPkts[x] = 0;
         }
         
         //interate all buffers
@@ -127,6 +144,7 @@ public class Router {
                 outFull[x] = 0;
                 outEmpty[x] = 0;
                 outAvgPkts[x] = 0;
+                outDroppedPkts[x] = 0;
         }
         
         //calls the method to configure the simulator
@@ -181,28 +199,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
             //create the fabric type, and pass input & output buffer 
             this.sFabric = new Crossbar(FABRICSPEED,inputBuffer,outputBuffer);
         }
-//**********************    T E S T I N G   ****************  
-/*
-        PacketFactory pf = new PacketFactory(this,totalNumberOfPackets,PACKETSIZE ,INPUTBUFFERS);
-        
-        try
-        {
 
-            for(int y=0; y<INPUTBUFFERS; y++)
-                for(int x=0; x<4; x++)
-                {
-                    
-                    AddInputPacket(pf.CreatePacket(),y);
-                    
-                }
-        }
-        catch(Exception e)
-        {
-            System.out.println("Error");
-        }
-*/
-//**********************************************************        
-        
         
     }
     
@@ -229,7 +226,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         //create all packets needed
         PacketFactory pFactory = new PacketFactory(totalNumberOfPackets,PACKETSIZE, INPUTBUFFERS );
         //create packet consumption object
-        PacketConsumption pConsumer = new PacketConsumption(cfg);
+        PacketConsumption pConsumer = new PacketConsumption(cfg, OUTPUTBUFFERS);
         
         //attempt to capture each bus for input packets
         for(int x=0; x<sFabric.GetVerticalBuses(); x++)
@@ -588,12 +585,21 @@ else if(inputType == 1)
             {
 //**************************************************
 //NEED TO CONSUME ACCORDING TO DISTRIBUTION
-pConsumer.ConsumePackets(TIME,1, outputBuffer,cfg);
+pConsumer.ConsumePackets(TIME, outputBuffer, SEED, readyQueue,PULSE, current);
 //**************************************************
+/*
                 //update the next Consumption Bus event time
                 current.SetTicks(current.GetTicks()+PULSE);
                 //put the updated Consumption Bus event back in the ready queue
                 readyQueue.add(current);
+*/               
+            }
+            else if (current.GetActionToBeTaken().compareToIgnoreCase("DiscardPacket") == 0)
+            {
+//**************************************************
+pConsumer.DiscardPackets(TIME, outputBuffer, current.GetOutputBuffer(), current, readyQueue);
+//**************************************************
+                
             }
             //checkevent for fabric switching
             else if (current.GetActionToBeTaken().compareToIgnoreCase("FabricSwitching") == 0)
@@ -738,6 +744,10 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
                 {
                     //gather how many times the buffer was full
                     outFull[current.GetOutputBuffer()] += 1;
+                    //how many packets in total dropped
+                    outputtotalDroppedPkts += 1;
+                    //gather how many times packets were dropped
+                    outDroppedPkts[current.GetOutputBuffer()] += 1;
                 
 if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
@@ -882,7 +892,9 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
         
         System.out.println("\n\n\n                          S U M M A R Y\n");
         
-        System.out.println("Rate of Switching Fabric = ");
+        System.out.println("Rate of Switching Fabric                     = "+((double)TIME)/(double)totalNumberOfPackets);
+        System.out.println("Total <Input> Dropped Packet(s)              = "+inputtotalDroppedPkts);
+        System.out.println("Total <Output> Dropped Packet(s)             = "+outputtotalDroppedPkts);
         
         System.out.println("\n\n*** <INPUT> Buffers ***");
         for(int x=0; x<INPUTBUFFERS;x++)
@@ -898,9 +910,10 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
                 full = df.format(((inFull[x]/inDelivery[x])*100));
             } 
             System.out.println();
-            System.out.println("Input  Buffer["+(x+1)+"] Percentage Empty           = "+inEmpty[x]+"/"+inDelivery[x]+" = "+empty+"%");
-            System.out.println("Input  Buffer["+(x+1)+"] Percentage Full            = "+inFull[x]+"/"+inDelivery[x]+" = "+full+"%");
-            System.out.println("Input  Buffer["+(x+1)+"] Average Number of pkt(s)   = "+inAvgPkts[x]);
+            System.out.println("Input  Buffer["+(x+1)+"] Percentage Empty            = "+inEmpty[x]+"/"+inDelivery[x]+" = "+empty+"%");
+            System.out.println("Input  Buffer["+(x+1)+"] Percentage Full             = "+inFull[x]+"/"+inDelivery[x]+" = "+full+"%");
+            System.out.println("Input  Buffer["+(x+1)+"] Average Number of pkt(s)    = "+inAvgPkts[x]);
+            System.out.println("Input  Buffer["+(x+1)+"] Dropped pkt(s)              = "+inDroppedPkts[x]);
         }
         
         System.out.println("\n\n*** <OUTPUT> Buffers ***");
@@ -920,9 +933,10 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
             
             
             System.out.println();
-            System.out.println("Output Buffer["+(x+1)+"] Percentage Empty           = "+outEmpty[x]+"/"+outDelivery[x]+" = "+empty+"%");
-            System.out.println("Output Buffer["+(x+1)+"] Percentage Full            = "+outFull[x]+"/"+outDelivery[x]+" = "+full+"%");
-            System.out.println("Output Buffer["+(x+1)+"] Average Number of pkt(s)   = "+outAvgPkts[x]);
+            System.out.println("Output  Buffer["+(x+1)+"] Percentage Empty           = "+outEmpty[x]+"/"+outDelivery[x]+" = "+empty+"%");
+            System.out.println("Output  Buffer["+(x+1)+"] Percentage Full            = "+outFull[x]+"/"+outDelivery[x]+" = "+full+"%");
+            System.out.println("Output  Buffer["+(x+1)+"] Average Number of pkt(s)   = "+outAvgPkts[x]);
+            System.out.println("Output  Buffer["+(x+1)+"] Dropped pkt(s)             = "+outDroppedPkts[x]);
         }
         
     }

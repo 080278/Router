@@ -59,4 +59,5 @@ public abstract class Distribution
     public abstract void SetNumebrOfPackets(int packets);
     public abstract void remove();
     public abstract int getNumber();
+    public abstract Queue GetDistributionQueue();
 }

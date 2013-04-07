@@ -109,6 +109,12 @@ public class ExponentialDistribution extends Distribution
             NumberOfPackets = packets;
         }
         
+        //return the Queue holding the distribution
+        public Queue GetDistributionQueue()
+        {
+            return q;
+        }
+        
         public int getNumber()
         {
             int value = -1;
@@ -160,7 +166,7 @@ public class ExponentialDistribution extends Distribution
     {
         
         
-        int NumberOfPackets = 15;
+        int NumberOfPackets = 5 ;
         //*************************
         double mean = 10;//2.9;
         //*************************
@@ -168,7 +174,19 @@ public class ExponentialDistribution extends Distribution
         System.out.println("Packets arrival distributions: ");
             //for packet times delivery, seed to keep the same number
             Random rnd = new Random();
-            int NumberOfTimesPacketsAreDeliverd = rnd.nextInt(NumberOfPackets);
+            //defaults to 1 unless packet count > 1
+            int NumberOfTimesPacketsAreDeliverd = 1;
+            //or else the random will be 0
+            if(NumberOfPackets > 1)
+            {
+                do{
+                     
+                    NumberOfTimesPacketsAreDeliverd = rnd.nextInt(NumberOfPackets+1);
+                }
+                while(NumberOfTimesPacketsAreDeliverd == 0);
+            }
+            System.out.println("NumberOfTimesPacketsAreDeliverd: "+NumberOfTimesPacketsAreDeliverd);
+            
             //based on the number of packets, a random number is chosen for the 
             //number of times packet delivery happens
             ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
@@ -179,7 +197,7 @@ public class ExponentialDistribution extends Distribution
             arrivalAmounts.SetNumebrOfPackets(NumberOfPackets);
             arrivalAmounts.getDistribution();
             
-            
+/*            
         System.out.println("Arrival Patterns");
             ExponentialDistribution arrivalPattern= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);  
             int packetAmt;
@@ -190,6 +208,6 @@ public class ExponentialDistribution extends Distribution
                 arrivalPattern.getDistribution();
                 arrivalPattern.remove();
             }
-
+*/
     }
 }
