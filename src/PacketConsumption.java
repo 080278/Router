@@ -1,15 +1,3 @@
-
-import java.net.InetAddress;
-import java.util.*;
-
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
-
 import java.util.*;
 import java.net.InetAddress;
 
@@ -50,7 +38,7 @@ public class PacketConsumption
         //holds the buffer to remove the packets from        
         int bufferNumber = -1;
         //uniform random selection of outputBuffer
-        Random rnd = new Random();
+        Random rnd = new Random(SEED);
         
         //output buffer number selection
         bufferNumber = rnd.nextInt(outputBuffer.length);

@@ -71,12 +71,24 @@ public class Router {
     //public Router(int INPUTBUFFERS, int OUTPUTBUFFERS, int pulse, int packetSize, int fabricSpeed, int totalNumberOfPackets)
     public Router()
     {
-        //save the current time seed
-        SEED = System.currentTimeMillis();
         
         //read the configuration file
         cfg = new ConfigFile();
         
+        try
+        {
+            if(((String)cfg.GetConfig("GENERAL", "Seed")).compareToIgnoreCase("Auto") == 0)
+            {
+                //save the current time seed
+                SEED = System.currentTimeMillis();
+            }
+        }
+        catch(Exception e)
+        {
+            
+        
+            SEED = Long.parseLong(((Object)cfg.GetConfig("GENERAL", "Seed")).toString());
+        }
         //set the clock time
         TIME = 0;
         //set the pulse of the router
@@ -104,6 +116,7 @@ public class Router {
         
         //initialize the input buffers
         inputBuffer = new LinkedList[this.INPUTBUFFERS];
+            //initialize input buffer statistics
             inDelivery = new double[INPUTBUFFERS];
             inFull = new double[INPUTBUFFERS];
             inEmpty = new double[INPUTBUFFERS];
@@ -111,6 +124,7 @@ public class Router {
             inDroppedPkts = new int[INPUTBUFFERS];
         //initialize the output buffers
         outputBuffer = new LinkedList[this.OUTPUTBUFFERS];
+            //initialize output buffer statistics
             outDelivery = new double[OUTPUTBUFFERS];
             outFull = new double[OUTPUTBUFFERS];
             outEmpty = new double[OUTPUTBUFFERS];
@@ -209,14 +223,17 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         //bus used to move the packet
         int busUsed;
        
+//********************************************
+//need to use distribution here        
         //generate random number
-        Random st = new Random();
+        Random st = new Random(SEED);
+//********************************************
         
-        //*****************************************************************
-        //NEED TO USE THE [distribution, seed value] TO ENSURE CONSISTENCY 
-        //bSelect selection
-        Random rIn = new Random();
-//**************************************************************   
+        
+        //used to select randomly between inputBuffer or internalMemory
+        //for the Memory Fabric type
+        //this is an internal operation, DO NOT USE Distribution for this
+        Random rIn = new Random(SEED);
         //holds the current event
         Event current;
         
@@ -785,8 +802,6 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
                 }
                 
                 
-                //sFabric.SetBusInActiveStatus(busUsed, FROM,sFabric.GetCurrentPacketUsingTheBus());
-                //sFabric.SetBusInActiveStatus(TO, FROM,sFabric.GetCurrentPacketUsingTheBus());
             }
             
             //checkevent for move packet from Fabric InternalMemory to output buffer
