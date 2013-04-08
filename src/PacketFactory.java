@@ -188,7 +188,7 @@ for(int y=0;y<inputBuffer.length;y++)
                     //put packet in the input buffer 
                     inputBuffer[y].add(rP);
                     
-                    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                    if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                     { 
                         System.out.println("Time: "+TIME+"    <INPUT><ARRIVED>    Packet: "+(packetsDelivered+1)+
                                 "    InputBuffer: "+ (y+1));
@@ -216,7 +216,7 @@ for(int y=0;y<inputBuffer.length;y++)
                     //gather how many times packets were dropped
                     router.inDroppedPkts[y] += 1;
                     
-                    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                    if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
 System.out.println("\nTime: "+ TIME + "    --> Input["+(y+1)+"]" + " = "+ 
         inputBuffer[y].size()+"    Packet(s)"+ "    Cannot deliver Packet"+

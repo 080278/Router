@@ -57,12 +57,15 @@ public class PacketConsumption
 //******************************************************
 //              DISTRIBUTION
 
-        int discard = 0;
+        double discard = 0;
+        //int discard = 0;
                 
         //holds the number of packet found in the buffer
         int NumberOfPackets = outputBuffer[bufferNumber].size();
         //holds the mean of the OUTPUT-DISTRIBUTION from the config file
-        double mean = Double.parseDouble(cfg.GetConfig("OUTPUT-DISTRIBUTION","Mean").toString());
+        double mean = Double.parseDouble(cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Mean").toString());
+        //holds the Standard Deviation of the OUTPUT-DISTRIBUTION from the config file
+        double stdDev = Double.parseDouble(cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Deviation").toString());
         //for packet times delivery, seed to keep the same number of the simulator
         Random rnd1 = new Random(SEED);
 
@@ -86,34 +89,49 @@ public class PacketConsumption
             
 
             //check if OUTPUT-DISTRIBUTION = Exponential
-            if(((String)cfg.GetConfig("OUTPUT-DISTRIBUTION","Type")).
+            if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
                     compareToIgnoreCase("Exponential") == 0)
             {
                 //create class, set the number of time the packets are broken up
                 dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
-                //set the mean
-                dType.SetMean(mean);
-                //set how many packets present
-                dType.SetNumebrOfPackets(NumberOfPackets);
-                //get the distribution of the packets to remove
-                dType.getDistribution();
+            }
+            //check if OUTPUT-DISTRIBUTION = Uniform
+            else if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
+                    compareToIgnoreCase("Uniform") == 0)
+            {
+                //create class, set the number of time the packets are broken up
+                dType = new UniformDistribution(mean, stdDev);
+            }
+            //check if OUTPUT-DISTRIBUTION = Normal
+            else if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
+                    compareToIgnoreCase("Normal") == 0)
+            {
+                //create class, set the number of time the packets are broken up
+                dType = new NormalDistribution(mean, stdDev);
+            }
+            //set the mean
+            dType.SetMean(mean);
+            //set how many packets present
+            dType.SetNumebrOfPackets(NumberOfPackets);
+            //get the distribution of the packets to remove
+            dType.getDistribution();
 
-                tmp = dType.GetDistributionQueue();
-                //ensure there is an entry of a distribution
-                //if((timing[bufferNumber] != null) && (tmp.size() > 0))
-                if(tmp.size() > 0)
+            tmp = dType.GetDistributionQueue();
+            //ensure there is an entry of a distribution
+            //if((timing[bufferNumber] != null) && (tmp.size() > 0))
+            if(tmp.size() > 0)
+            {
+                //check for null,distribution queue is empty of packet discard timings
+                if(timing[bufferNumber] == null) 
                 {
-                    //check for null,distribution queue is empty of packet discard timings
-                    if(timing[bufferNumber] == null) 
-                    {
-                        timing[bufferNumber] = tmp;
-                    }
-                    else if(timing[bufferNumber].size() == 0)
-                    {
-                        timing[bufferNumber] = tmp;
-                    }
+                    timing[bufferNumber] = tmp;
+                }
+                else if(timing[bufferNumber].size() == 0)
+                {
+                    timing[bufferNumber] = tmp;
                 }
             }
+            
         
         
         
@@ -123,7 +141,7 @@ public class PacketConsumption
                 {
                     //remove a packet from the outputBuffers chosen at random
                     RouterPacket rp = (RouterPacket)outputBuffer[bufferNumber].peek();
-                    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                    if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                     {
                         System.out.println("Time: "+TIME+"    <Consuming> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
                     }
@@ -135,12 +153,12 @@ public class PacketConsumption
                 }
 
                 //plus tick to discard the packet from the buffer
-                discard = (int)timing[bufferNumber].remove();
-
+                discard = Double.parseDouble(timing[bufferNumber].remove().toString());
+//discard = (int)timing[bufferNumber].remove();
                 try
                 {
                     //add 1 Discard Packet events to the simulator
-                    Event evt = new Event(TIME +discard+PULSE, "DiscardPacket");
+                    Event evt = new Event(TIME +(int)discard+PULSE, "DiscardPacket");
                     //get how many packets to discard
                     int numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
                         (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("buffer"+(bufferNumber+1)) ));
@@ -156,7 +174,7 @@ public class PacketConsumption
         }
           
         //update the next Consumption Bus event time
-        current.SetTicks(TIME+discard+PULSE);
+        current.SetTicks(TIME+(int)discard+PULSE);
         //put the updated Consumption Bus event back in the ready queue
         pQ.add(current);
         
@@ -183,7 +201,7 @@ public class PacketConsumption
             {
                 //remove a packet from the outputBuffers chosen at random
                 RouterPacket rp = (RouterPacket)outputBuffer[bufferNumber].remove();
-                if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                 {
                     System.out.println("Time: "+TIME+"    <CONSUMED> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
                 }
@@ -207,7 +225,7 @@ public class PacketConsumption
             {
                 //remove a packet from the outputBuffers chosen at random
                 RouterPacket rp = (RouterPacket)outputBuffer[bufferNumber].remove();
-                if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                 {
                     System.out.println("Time: "+TIME+"    <DISCARD> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
                 }

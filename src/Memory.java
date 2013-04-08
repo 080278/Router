@@ -202,7 +202,7 @@ public class Memory extends SwitchingFabric{
                 //set the recently used bus
                 recentBus = busNumber;
                 
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                
     Print(true, busNumber,packetSequence,true,TIME); 
 }
@@ -211,7 +211,7 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
             }
         }
         
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {        
     Print(false, busNumber,packetSequence,true,TIME);   
 }
@@ -251,7 +251,7 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
                 //no packet using the bus
                 sequence[0] = -1;
                 
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                
     Print(true, busNumber,packetSequence,false,TIME); 
 }
@@ -260,7 +260,7 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
             }
         }
         
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {        
     Print(false, busNumber,packetSequence,false,TIME);  
 }

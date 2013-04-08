@@ -23,6 +23,8 @@ public class UniformDistribution extends Distribution
     public  UniformDistribution(double mean,double standardDeviation)
     {
         super(mean, standardDeviation);
+        //initialize the queue for output
+        q=new LinkedList();
         //super.mean = mean;
         //super.standardDeviation = standardDeviation;
         //getDistribution(1.5);
@@ -40,9 +42,11 @@ public class UniformDistribution extends Distribution
         //public int getDistribution(double standardDeviation) 
         public int getDistribution() 
         {
-            double value = -1;
+            double value  = -1;
             
-            value = (Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation);
+            value = ((Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation));
+            
+            q.add(value);
                 
             System.out.println(value);
             return -1;
@@ -86,6 +90,13 @@ public class UniformDistribution extends Distribution
             {
                 System.out.println(getNumber());
             }
+        }
+        
+        public double mean() 
+        {
+            //**************************
+            return this.mean;
+            //**************************
         }
        
     public static void main(String[] args)

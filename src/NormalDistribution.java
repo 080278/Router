@@ -23,6 +23,8 @@ public class NormalDistribution extends Distribution
     public NormalDistribution(double mean,double standardDeviation)
     {
         super(mean, standardDeviation);
+        //initialize the queue for output
+        q=new LinkedList();
         //getDistribution(0.5);
         //getDistribution();
     }
@@ -42,6 +44,9 @@ public class NormalDistribution extends Distribution
         for (int i=0;i<10;i++)
         {
             int val = (int) (mean + standardDeviation * rand.nextGaussian());
+            
+            q.add(val);
+            
             System.out.println(val);
         }
         return -1;
@@ -79,6 +84,13 @@ public class NormalDistribution extends Distribution
         }
         //************************
    
+        public double mean() 
+        {
+            //**************************
+            return this.mean;
+            //**************************
+        }
+        
     public static void main(String[] args)
     {
        

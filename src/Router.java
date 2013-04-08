@@ -446,7 +446,7 @@ else if(inputType == 1)
                     if(sFabric.GetBusActiveStatus(BUS)) 
                     {
                         {
-                            if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                            if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                             {
                                 //inputBuffer
                                 if((inputType == 0 ) && (inputBuffer[FROM].size() > 0))
@@ -518,7 +518,7 @@ else if(inputType == 1)
                                    ((inputType == 1) && (sFabric.SetBusActiveStatus(BUS,FROM,
                                     ((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber(),TIME,cfg) == true))) 
                                 {
-    if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+    if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
     {    
         if(inputType == 0)
             System.out.println("Time: "+ TIME +"    SetACTIVE  FROM input: "+(FROM+1)+" TO output: "+(TO+1)+" Sequence: "+peekPacket.GetSequenceNumber());                        
@@ -646,7 +646,7 @@ pConsumer.DiscardPackets(TIME, outputBuffer, current.GetOutputBuffer(), current,
                         if(sFabric.GetPacketMoved())
                         {
                             
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
     System.out.println("Time: "+ TIME + "    <InternalMemory><ARRIVED>    Packet: "+
             sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
@@ -708,7 +708,7 @@ System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
         + outputBuffer[current.GetOutputBuffer()].size());                    
                     */
 
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
     System.out.println("Time: "+ TIME + "    <OUTPUT><ARRIVED>    Packet: "+
             sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
@@ -749,7 +749,7 @@ if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0
                     //gather how many times packets were dropped
                     outDroppedPkts[current.GetOutputBuffer()] += 1;
                 
-if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
 System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer()+1)+"]" + " = "+ 
         outputBuffer[current.GetOutputBuffer()].size()+"    Packet(s)"+ "    Cannot deliver Packet"+
@@ -839,7 +839,7 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
                         outAvgPkts[current.GetOutputBuffer()] += outputBuffer[current.GetOutputBuffer()].size();
                         outAvgPkts[current.GetOutputBuffer()] /=2;
 
-                        if(((String)cfg.GetConfig("DISPLAY","Verbose")).compareToIgnoreCase("True") == 0)
+                        if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                         {                    
                             System.out.println("Time: "+ TIME + "    <OUTPUT><ARRIVED><***   INTERNAL MEMORY   ***>    Packet: "+
                                     sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
