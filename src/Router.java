@@ -84,6 +84,8 @@ public class Router {
                 //save the current time seed
                 SEED = System.currentTimeMillis();
             }
+            else
+                SEED = Long.getLong((String)cfg.GetConfig("GENERAL", "Seed"));
         }
         catch(Exception e)
         {
@@ -475,16 +477,18 @@ else if(inputType == 1)
                             if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                             {
                                 //inputBuffer
-                                if((inputType == 0 ) && (inputBuffer[FROM].size() > 0))
+                                if((inputType == 0 ) && (inputBuffer[FROM].size() > 0) &&
+                                    (sFabric instanceof Crossbar )    )
                                 {
                                     sFabric.Print(false, TO,inputBuffer[FROM].peek().GetSequenceNumber(),true,TIME);
                                 }
                                 //Fabric internalMemory
-                                else if(inputType == 1) 
+                                else if((inputType == 1) &&
+                                    (sFabric instanceof Memory )    )
                                 {
-                                    sFabric.Print(false, TO,
-                                    ((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber(),
-                                    true,TIME);
+                                    //sFabric.Print(false, TO,
+                                    //((Memory)sFabric).GetInternalMemoryRouterPacket(FROM).GetSequenceNumber(),
+                                    //true,TIME);
                                 }
                             }
                         }
@@ -735,17 +739,21 @@ System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
                     */
 
 if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
-{                    
-    if(sFabric.GetCurrentPacketUsingTheBus(current.GetBus()) != -1)
+{       
+    //check packet was successfully moved
+    if (sFabric.GetPacketMoved())
     {
-        System.out.println("Time: "+ TIME + "    <OUTPUT><ARRIVED>    Packet: "+
-            sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
-            "    Input["+(current.GetInputBuffer()+1)+"]" +" = "+
-            inputBuffer[current.GetInputBuffer()].size()+"    --> Output["+(current.GetOutputBuffer()+1)+"]" 
-            + " = "+ outputBuffer[current.GetOutputBuffer()].size()+
-            //"   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
-            //"   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+
-            "    PKT(S)-Moved:"+NumberOfPacketsMoved); 
+        if(sFabric.GetCurrentPacketUsingTheBus(current.GetBus()) != -1)
+        {
+            System.out.println("Time: "+ TIME + "    <PACKET ARRIVED AT OUTPUT FROM><***   INPUT BUFFER   ***>>    Packet: "+
+                sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
+                "    Input["+(current.GetInputBuffer()+1)+"]" +" = "+
+                inputBuffer[current.GetInputBuffer()].size()+"    --> Output["+(current.GetOutputBuffer()+1)+"]" 
+                + " = "+ outputBuffer[current.GetOutputBuffer()].size()+
+                //"   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
+                //"   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+
+                "    PKT(S)-Moved:"+NumberOfPacketsMoved); 
+        }
     }
 }
                 /*sFabric.GetCurrentPacketUsingTheBus(current.GetOutputBuffer())+
@@ -868,7 +876,7 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
 
                         if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                         {                    
-                            System.out.println("Time: "+ TIME + "    <OUTPUT><ARRIVED><***   INTERNAL MEMORY   ***>    Packet: "+
+                            System.out.println("Time: "+ TIME + "    <PACKET ARRIVED AT OUTPUT FROM><***   INTERNAL MEMORY   ***>    Packet: "+
                                     sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
                                     "    --> Output["+(current.GetOutputBuffer()+1)+"]" 
                                     + " = "+ outputBuffer[current.GetOutputBuffer()].size()+
@@ -919,6 +927,25 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
         
         System.out.println("\n\n\n                          S U M M A R Y\n");
         
+        
+        Enumeration enm = cfg.GetConfigHashtable().keys() ;
+        System.out.println("<CONFIGURATIONS>");
+        System.out.println("    SEED = "+SEED);
+        //iterate through Hashtable keys Enumeration
+        while(enm.hasMoreElements())
+        {
+            Object o = enm.nextElement();
+            System.out.println("    "+o);
+            
+            Hashtable hsh = (Hashtable)cfg.GetConfigHashtable().get(o);
+            Enumeration enm1 = hsh.keys() ;
+            while(enm1.hasMoreElements())
+            {
+                Object o1 = enm1.nextElement();
+                System.out.println("        "+o1+" = "+hsh.get(o1));
+            }
+        }
+        System.out.println();
         System.out.println("Rate of Switching Fabric                     = "+((double)TIME)/(double)totalNumberOfPackets);
         System.out.println("Total <Input> Dropped Packet(s)              = "+inputtotalDroppedPkts);
         System.out.println("Total <Output> Dropped Packet(s)             = "+outputtotalDroppedPkts);

@@ -11,7 +11,7 @@ public class UniformDistribution extends Distribution
     
 //******************************************    
     //create random object
-   Random rand = new Random();
+   Random rand = new Random(SEED);
     
     private Queue q;
 //******************************************

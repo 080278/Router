@@ -81,7 +81,9 @@ public class Bus extends SwitchingFabric{
         busNumber = 0;
         
         //ensure valid busNumber chosen
-        if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0) &&
+        //if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) > 0) &&
+        //    (busActiveStatus[busNumber] == false))
+        if(((busNumber+1)<= VERTICALBUSES) && ((busNumber+1) >0) &&
             (busActiveStatus[busNumber] == false))
         {
             //check if bus free, or already used by a buffer
@@ -107,19 +109,19 @@ public class Bus extends SwitchingFabric{
                 //set the recently used bus
                 recentBus = busNumber;
                 
-if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
-{                
-    Print(true, busNumber,packetSequence,true,TIME); 
-}
+                if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
+                {                
+                    Print(true, busNumber,packetSequence,true,TIME); 
+                }
                 //successfully controlled the bus
                 return true;
             }
         }
         
-if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
-{        
-    Print(false, busNumber,packetSequence,true,TIME);   
-}
+        if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
+        {        
+            Print(false, busNumber,packetSequence,true,TIME);   
+        }
         //was unable to control the bus
         return false;
     }

@@ -12,7 +12,7 @@ public class ExponentialDistribution extends Distribution
     //number of packets
     private int NumberOfPackets;
    //create random object
-   Random rand = new Random();
+   Random rand = new Random(SEED);
     
    //create distribution array
    //int[] EDarray;
@@ -65,11 +65,11 @@ public class ExponentialDistribution extends Distribution
             }
             
             
-            //for(Object x:EDarray)  
-            //{
-            //    System.out.print((int)x+" ");
-            //}
-            //System.out.println("\n-----------");
+            for(Object x:EDarray)  
+            {
+                System.out.print((int)x+" ");
+            }
+            System.out.println("\n-----------");
   
 
             
@@ -82,7 +82,7 @@ public class ExponentialDistribution extends Distribution
             for(int x:a)  
             //for(Object x:EDarray)  
             {
-                //System.out.print(x+" ");
+                System.out.print(x+" ");
                 q.add(x);
                 //***************
                 total += x;
@@ -90,9 +90,9 @@ public class ExponentialDistribution extends Distribution
             }
             
             //***************
-            //System.out.println("\n<Total>: "+total);
+            System.out.println("\n<Total>: "+total);
             //***************
-            //System.out.println("<E N D>\n");
+            System.out.println("<E N D>\n");
             /*
             List lst = Arrays.asList(a);
             q.addAll(lst);
@@ -173,7 +173,7 @@ public class ExponentialDistribution extends Distribution
         
         System.out.println("Packets arrival distributions: ");
             //for packet times delivery, seed to keep the same number
-            Random rnd = new Random();
+            Random rnd = new Random(SEED);
             //defaults to 1 unless packet count > 1
             int NumberOfTimesPacketsAreDeliverd = 1;
             //or else the random will be 0

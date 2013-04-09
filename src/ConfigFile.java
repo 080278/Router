@@ -105,6 +105,11 @@ public class ConfigFile {
         return tmp.get(option.toUpperCase());
     }
     
+    //get the hash table
+    public Hashtable GetConfigHashtable()
+    {
+        return configSections;
+    }
     
     public static void main(String []args)
     {
