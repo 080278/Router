@@ -87,7 +87,7 @@ public class ConfigFile {
         }
         catch(Exception e){
             //get the error message
-            System.out.println("Error: " + e.getMessage());
+            //System.out.println("Error: " + e.getMessage());
             status = false;
         }
                 

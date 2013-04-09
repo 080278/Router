@@ -21,10 +21,10 @@ public class ExponentialDistribution extends Distribution
    private Queue q;
            
    
-    public  ExponentialDistribution(int NumberOfTimesPacketsAreDeliverd)
+    public  ExponentialDistribution(int NumberOfTimesPacketsAreDeliverd, long SEED)
     {
         
-        super(NumberOfTimesPacketsAreDeliverd);
+        super(NumberOfTimesPacketsAreDeliverd, SEED);
         
         //initialize the distribution array 
         EDarray = new ArrayList();
@@ -65,11 +65,11 @@ public class ExponentialDistribution extends Distribution
             }
             
             
-            for(Object x:EDarray)  
-            {
-                System.out.print((int)x+" ");
-            }
-            System.out.println("\n-----------");
+            //for(Object x:EDarray)  
+            //{
+            //    System.out.print((int)x+" ");
+            //}
+            //System.out.println("\n-----------");
   
 
             
@@ -82,7 +82,7 @@ public class ExponentialDistribution extends Distribution
             for(int x:a)  
             //for(Object x:EDarray)  
             {
-                System.out.print(x+" ");
+                //System.out.print(x+" ");
                 q.add(x);
                 //***************
                 total += x;
@@ -90,9 +90,9 @@ public class ExponentialDistribution extends Distribution
             }
             
             //***************
-            System.out.println("\n<Total>: "+total);
+            //System.out.println("\n<Total>: "+total);
             //***************
-            System.out.println("<E N D>\n");
+            //System.out.println("<E N D>\n");
             /*
             List lst = Arrays.asList(a);
             q.addAll(lst);
@@ -165,8 +165,8 @@ public class ExponentialDistribution extends Distribution
     public static void main(String[] args)
     {
         
-        
-        int NumberOfPackets = 15 ;
+        long SEED = 287848937;
+        int NumberOfPackets = 10 ;
         //*************************
         double mean = 10;//2.9;
         //*************************
@@ -189,7 +189,7 @@ public class ExponentialDistribution extends Distribution
             
             //based on the number of packets, a random number is chosen for the 
             //number of times packet delivery happens
-            ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
+            ExponentialDistribution arrivalAmounts= new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd,SEED);
             
             //**********************************
             arrivalAmounts.SetMean(mean);

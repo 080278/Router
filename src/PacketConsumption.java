@@ -82,18 +82,20 @@ public class PacketConsumption
             
 
             //check if OUTPUT-DISTRIBUTION = Exponential
-            if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
-                    compareToIgnoreCase("Exponential") == 0)
+            //if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
+            //        compareToIgnoreCase("Exponential") == 0)
             {
                 //create class, set the number of time the packets are broken up
-                dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd);
+                dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd, SEED);
             }
+            /*
             //check if OUTPUT-DISTRIBUTION = Uniform
             else if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
                     compareToIgnoreCase("Uniform") == 0)
             {
                 //create class, set the number of time the packets are broken up
-                dType = new UniformDistribution(mean, stdDev);
+                //dType = new UniformDistribution(mean, stdDev,SEED);
+                dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd, SEED);
                 
             }
             //check if OUTPUT-DISTRIBUTION = Normal
@@ -101,8 +103,10 @@ public class PacketConsumption
                     compareToIgnoreCase("Normal") == 0)
             {
                 //create class, set the number of time the packets are broken up
-                dType = new NormalDistribution(mean, stdDev);
+                //dType = new NormalDistribution(mean, stdDev,SEED);
+                dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd, SEED);
             }
+            */ 
             //set the mean
             dType.SetMean(mean);
             //set how many packets present
@@ -150,20 +154,32 @@ public class PacketConsumption
                 //discard = Double.parseDouble(timing[bufferNumber].remove().toString());
                 discard = (int)timing[bufferNumber].remove();
 //discard = (int)timing[bufferNumber].remove();
+                
+                //add 1 Discard Packet events to the simulator
+                //Event evt = new Event(TIME +(int)discard+PULSE, "DiscardPacket");
+                Event evt = new Event(TIME +(int)discard, "DiscardPacket");
+                int numberOfPacketsToDiscard;
                 try
                 {
-                    //add 1 Discard Packet events to the simulator
-                    //Event evt = new Event(TIME +(int)discard+PULSE, "DiscardPacket");
-                    Event evt = new Event(TIME +(int)discard, "DiscardPacket");
+                    
+                    
                     //get how many packets to discard
-                    int numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
+                    numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
                         (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("buffer"+(bufferNumber+1)) ));
                     
-                    evt.SetBusReleaseInfo(bufferNumber, 0, numberOfPacketsToDiscard, 0);
-                    pQ.add(evt);
+                    
+                    //evt.SetBusReleaseInfo(bufferNumber, 0, numberOfPacketsToDiscard, 0);
+                    //pQ.add(evt);
                 }
-                catch(Exception e){}
+                catch(Exception e){
+                    //get how many packets to discard
+                    numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
+                        (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", "Default" ));
+                    
+                }
 
+                evt.SetBusReleaseInfo(bufferNumber, 0, numberOfPacketsToDiscard, 0);
+                pQ.add(evt);
             
     //*************************************************************** 
             }

@@ -7,6 +7,8 @@ public class UniformDistribution extends Distribution
 {
     //number of packets
     private int NumberOfPackets;
+    long SEED;
+    
 //******************************************    
     //create random object
    Random rand = new Random();
@@ -22,12 +24,13 @@ public class UniformDistribution extends Distribution
     
    
    //Uniform Distribution class constructor
-    public  UniformDistribution(double mean,double standardDeviation)
+    public  UniformDistribution(double mean,double standardDeviation, long SEED)
     {
         //super(mean, standardDeviation,inputbuffersize);
-        super(mean, standardDeviation);
+        super(mean, standardDeviation, SEED);
         //initialize the queue for output
         q=new LinkedList();
+        this.SEED = SEED;
         //super.mean = mean;
         //super.standardDeviation = standardDeviation;
         //getDistribution(1.5);
@@ -41,6 +44,9 @@ public class UniformDistribution extends Distribution
         //public int getDistribution(double standardDeviation) 
         public int getDistribution() 
         {
+            Random rnd = new Random(SEED);
+            inputbuffersize = rnd.nextInt(NumberOfPackets+1);
+            
             //keeps track of packets created
             int PacketCounter = 0;
             
@@ -53,11 +59,36 @@ public class UniformDistribution extends Distribution
                 val = (int)((Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation));
                     //add each value to the distribution array
                     q.add(val);
+                    //a[(val%inputbuffersize)] +=1;
                 PacketCounter +=1;
-                System.out.print((int)val+ " ");
+                //System.out.print((int)val+ " ");
             }
  
-                System.out.println();
+            //for(Object x:q)  
+            //{
+            //    System.out.print((int)x+" ");
+            //}
+            //System.out.println("\n-----------");
+  
+
+            
+            
+            
+            //***************
+            //int total = 0;
+            //***************
+            
+            //for(int x:a)  
+            //for(Object x:EDarray)  
+            //{
+                //System.out.print(x+" ");
+            //    q.add(x);
+                //***************
+            //    total += x;
+                //***************
+            //}
+            
+                //System.out.println();
             //System.out.println((int)val);
             return -1;
         } 
@@ -120,13 +151,14 @@ public class UniformDistribution extends Distribution
         
         
         //int NumberOfTimesPacketsAreDeliverd = 0;
-        int NumberOfPackets = 10;
+        int NumberOfPackets = 50;
         //*************************
         double mean = 4.5;//2.9;
         double StandardDeviation = 1.5;
+        long SEED = 287848937;
         //*************************
         
-           UniformDistribution distribution= new UniformDistribution(mean,StandardDeviation);
+           UniformDistribution distribution= new UniformDistribution(mean,StandardDeviation, SEED);
    
            //**********************************
             distribution.SetMean(mean);

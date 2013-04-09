@@ -7,7 +7,9 @@ import java.net.InetAddress;
  */
 public class PacketFactory
 {
-    
+    Random rnd;
+    //holds the seed of the simulator
+    long SEED;
     //holds the packet sequence number
     int sequence;
     //holds the total number of packets to make
@@ -24,10 +26,15 @@ public class PacketFactory
     Queue packetCreated;
     //holds the total number of input buffers
     int totalNumberOfInputBuffers;
+    //holds the distribution type
+    private Distribution dType;
     
-    public PacketFactory(int totalNumberOfPackets,int packetSize, int totalNumberOfInputBuffers)
+    public PacketFactory(int totalNumberOfPackets,int packetSize, int totalNumberOfInputBuffers, long SEED)
     {
-        
+        //initialize the seed used by the simulator
+        this.SEED = SEED;
+        //initialize the random
+        rnd = new Random(this.SEED);
         //initialize the packet sequence
         sequence = 1;
         //ensure at least 1 packet is created
@@ -134,28 +141,160 @@ public class PacketFactory
         }
     }
 
+    //*****************************************************************************    
+    //remove packets from simulation output buffer
+    public void Distribute(ConfigFile cfg)
+    //public void XConsumePackets(int TIME, Queue<RouterPacket> []inputBuffer, PriorityQueue<Event> pQ,int PULSE, Event current)
+    {
+        //temporary hold the queue from distribution calculations
+        Queue tmp = null;
+
+        //double discard = 0;
+        int discard = 0;
+                
+        //holds the number of packet to create
+        int NumberOfPackets = totalNumberOfPackets;
+        
+        //holds the mean of the OUTPUT-DISTRIBUTION from the config file
+        double mean = Double.parseDouble(cfg.GetConfig("FACTORY-DISTRIBUTION","Mean").toString());
+        //holds the Standard Deviation of the OUTPUT-DISTRIBUTION from the config file
+        double stdDev = Double.parseDouble(cfg.GetConfig("FACTORY-DISTRIBUTION","Deviation").toString());
+        
+        //for packet times delivery, seed to keep the same number of the simulator
+        Random rnd1 = new Random(SEED);
+
+        //defaults to 1 unless packet count > 1
+        int NumberOfTimesPacketsAreDeliverd = 1;
+        //or else the random will be 0
+        if(NumberOfPackets > 0)
+        {
+            do{
+
+                //based on the number of packets in output buffer,
+                //a random number is chosen for the number of times packet delivery happens
+                NumberOfTimesPacketsAreDeliverd = rnd1.nextInt(NumberOfPackets+1);
+            }
+            while(NumberOfTimesPacketsAreDeliverd == 0);
+        
+
+//***************************************************************        
+//NEED TO USE THE DISTRIBUTION TYPE TO REMOVE PACKETS APPROPIATELY                  
+                
+            
+
+            //check if OUTPUT-DISTRIBUTION = Exponential
+            if(((String)cfg.GetConfig("FACTORY-DISTRIBUTION","Type")).
+                    compareToIgnoreCase("Exponential") == 0)
+            {
+                //create class, set the number of time the packets are broken up
+                dType = new ExponentialDistribution(NumberOfTimesPacketsAreDeliverd, SEED);
+            }
+                
+            //check if OUTPUT-DISTRIBUTION = Uniform
+            else if(((String)cfg.GetConfig("FACTORY-DISTRIBUTION","Type")).
+                    compareToIgnoreCase("Uniform") == 0)
+            {
+                //create class, set the number of time the packets are broken up
+                dType = new UniformDistribution(mean, stdDev,SEED);
+                
+            }
+            //check if OUTPUT-DISTRIBUTION = Normal
+            else if(((String)cfg.GetConfig("FACTORY-DISTRIBUTION","Type")).
+                    compareToIgnoreCase("Normal") == 0)
+            {
+                //create class, set the number of time the packets are broken up
+                dType = new NormalDistribution(mean, stdDev,SEED);
+            }
+             
+            //set the mean
+            dType.SetMean(mean);
+            //set how many packets present
+            dType.SetNumebrOfPackets(NumberOfPackets);
+            //get the distribution of the packets to remove
+            dType.getDistribution();
+
+            //tmp = dType.GetDistributionQueue();
+            
+        
+        /*
+        
+            if((timing[bufferNumber] != null) && (inputBuffer[bufferNumber].size() > 0))
+            {
+                try
+                {
+                    //remove a packet from the outputBuffers chosen at random
+                    RouterPacket rp = (RouterPacket)inputBuffer[bufferNumber].peek();
+                    if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
+                    {
+                        System.out.println("Time: "+TIME+"    <Consuming> packet: "+rp.GetSequenceNumber()+"   from OutputBuffer[ "+ (bufferNumber+1) + "] = "+outputBuffer[bufferNumber].size());
+                    }
+                }
+                catch(Exception e)
+                {
+                    //System.out.println("Time: "+TIME+"    NO packets to remove from OutputBuffer[ "+ bufferNumber + "]");
+                    //break;
+                }
+
+                //plus tick to discard the packet from the buffer
+                //discard = Double.parseDouble(timing[bufferNumber].remove().toString());
+                discard = (int)timing[bufferNumber].remove();
+//discard = (int)timing[bufferNumber].remove();
+                try
+                {
+                    //add 1 Discard Packet events to the simulator
+                    //Event evt = new Event(TIME +(int)discard+PULSE, "DiscardPacket");
+                    Event evt = new Event(TIME +(int)discard, "DiscardPacket");
+                    //get how many packets to discard
+                    int numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
+                        (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("buffer"+(bufferNumber+1)) ));
+                    
+                    evt.SetBusReleaseInfo(bufferNumber, 0, numberOfPacketsToDiscard, 0);
+                    pQ.add(evt);
+                }
+                catch(Exception e){}
+
+            
+    //*************************************************************** 
+            }
+            */
+        }
+          
+        //update the next Consumption Bus event time
+        //current.SetTicks(TIME+(int)discard+PULSE);
+        //put the updated Consumption Bus event back in the ready queue
+        //pQ.add(current);
+        
+        
+ 
+    }
+    
 //*****************************************************************************    
     //deliver packet to simulator input buffer
-    public void DeliverPacket(int rndType, Queue<RouterPacket> []inputBuffer, ConfigFile cfg, int TIME, Router router)
+    public void DeliverPacket(Queue<RouterPacket> []inputBuffer, ConfigFile cfg, int TIME, Router router)
     {
         //input buffer number
         int bufferNumber = 0;
         
-        switch(rndType)
-        {
-            case 1:
+        
 //***************************************************
-                Random rnd = new Random();
+// implement the factory distribution technique     
+        
+        if((dType == null) || (dType.GetDistributionQueue().size() == 0))
+            Distribute(cfg);
+        //dType.GetDistributionQueue();
+        int pkts = (int)dType.GetDistributionQueue().remove();
+                
                 //input buffer number
                 bufferNumber = rnd.nextInt(this.totalNumberOfInputBuffers);
-            break;
 //***************************************************        
-        }
 
 //***************************************************************        
 //NEED TO USE THE DISTRIBUTION TO DELIVER PACKETS APPROPRIATELY  
-for(int y=0;y<inputBuffer.length;y++)
-    for(int x=0;x<1;x++)
+//for(int y=0;y<inputBuffer.length;y++)
+//for(int y=0;y<1;y++)
+    int y = bufferNumber;
+    //for(int x=0;x<1;x++)
+    for(int x=0;x<pkts;x++)
             {
                 //size limit of the Input buffer
                 int limit;

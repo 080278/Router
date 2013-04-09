@@ -14,17 +14,19 @@ public class NormalDistribution extends Distribution
     private double mean;
     
     private Queue q;
+    long SEED;
 //******************************************
     
      //create normal distribution array
      int[] NDarray; // = new int[1000];
   
    //Constructor for normal distribution
-    public NormalDistribution(double mean,double standardDeviation)
+    public NormalDistribution(double mean,double standardDeviation, long SEED)
     {
-        super(mean, standardDeviation);
+        super(mean, standardDeviation,SEED);
         //initialize the queue for output
         q=new LinkedList();
+        this.SEED = SEED;
         //getDistribution(0.5);
         //getDistribution();
     }
@@ -41,14 +43,17 @@ public class NormalDistribution extends Distribution
     //public int getDistribution(double standardDeviation)
     public int getDistribution()
     {    
-        for (int i=0;i<10;i++)
+        //keeps track of packets created
+            int PacketCounter = 0;
+            
+        while (PacketCounter < NumberOfPackets)
         {
             int val = (int) (mean + standardDeviation * rand.nextGaussian());
             
             
             q.add(val);
-            
-            System.out.println(val);
+            //count packet 
+            PacketCounter += 1;
         }
         return -1;
     }
@@ -94,8 +99,8 @@ public class NormalDistribution extends Distribution
         
     public static void main(String[] args)
     {
-       
-        NormalDistribution arrivalAmounts= new NormalDistribution(15,0.5);
+       long SEED = 287848937;
+        NormalDistribution arrivalAmounts= new NormalDistribution(15,0.5,SEED);
         
         //arrivalAmounts.getNormalDistribution();
         

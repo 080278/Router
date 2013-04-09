@@ -7,6 +7,8 @@ import java.net.*;
 
 public class Router {
 
+    //holds the distribution type
+    private Distribution dType;
     //holds the clock time
     int TIME;
     //holds the tick interval an attempt to move a packet occurs
@@ -217,6 +219,12 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         
     }
     
+    //temporary hold the queue from distribution calculations
+    Queue tmp = null;
+    //holds the consumption amounts per time for each output buffer
+    private Queue []timing;
+    
+    
     public void RunSimulator()
     {
 //**************************************************************         
@@ -241,7 +249,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         RouterPacket peekPacket;
         
         //create all packets needed
-        PacketFactory pFactory = new PacketFactory(totalNumberOfPackets,PACKETSIZE, INPUTBUFFERS );
+        PacketFactory pFactory = new PacketFactory(totalNumberOfPackets,PACKETSIZE, INPUTBUFFERS, SEED );
         //create packet consumption object
         PacketConsumption pConsumer = new PacketConsumption(cfg, OUTPUTBUFFERS, SEED);
         
@@ -394,6 +402,7 @@ else if(inputType == 1)
                     
                     if(bSelect.size() > 0) 
                     {
+                        
                         //select an inputBuffer OR/ InternalMemory packet
                         idx = st.nextInt(bSelect.size());
                         //get the index value
@@ -419,7 +428,7 @@ else if(inputType == 1)
         //*************************                    
         //NEED TO ALLOCATE PROPERLY                    
         //puts 1024 packets in the the Input Buffers, every time                
-        pFactory.DeliverPacket(1, inputBuffer, cfg, TIME,this);
+        pFactory.DeliverPacket(inputBuffer, cfg, TIME,this);
         //*************************
 
         //***********************************************************
@@ -727,7 +736,9 @@ System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
 
 if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {                    
-    System.out.println("Time: "+ TIME + "    <OUTPUT><ARRIVED>    Packet: "+
+    if(sFabric.GetCurrentPacketUsingTheBus(current.GetBus()) != -1)
+    {
+        System.out.println("Time: "+ TIME + "    <OUTPUT><ARRIVED>    Packet: "+
             sFabric.GetCurrentPacketUsingTheBus(current.GetBus())+
             "    Input["+(current.GetInputBuffer()+1)+"]" +" = "+
             inputBuffer[current.GetInputBuffer()].size()+"    --> Output["+(current.GetOutputBuffer()+1)+"]" 
@@ -735,6 +746,7 @@ if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0
             //"   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
             //"   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+
             "    PKT(S)-Moved:"+NumberOfPacketsMoved); 
+    }
 }
                 /*sFabric.GetCurrentPacketUsingTheBus(current.GetOutputBuffer())+
                 "   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+

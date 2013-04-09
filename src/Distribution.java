@@ -5,8 +5,9 @@ import java.util.*;
 
 public abstract class Distribution 
 {
+    long SEED;
     //create random object
-    protected Random rand = new Random();
+    protected Random rand;
     //holds the list of input buffers
     protected static Queue []inputBuffers;
     //size of input buffer queue
@@ -17,16 +18,19 @@ public abstract class Distribution
     protected double mean;
     
     //constructor: Handles exponential distribution
-    public Distribution(int inputbuffersize)
+    public Distribution(int inputbuffersize, long SEED)
     {
+        this.SEED = SEED;
         this.inputbuffersize=inputbuffersize;
+        rand = new Random(SEED);
     }
     
     //constructor: Handles Normal and uniform distribution using mean and standard deviation
-    public Distribution(double mean, double standardDeviation)
+    public Distribution(double mean, double standardDeviation,long SEED)
     {
         this.mean=mean;
         this.standardDeviation=standardDeviation;
+        rand = new Random(SEED);
     }
     
      //set the standard deviation
