@@ -243,7 +243,7 @@ System.out.println("Time: "+GetTime()+" -->   Delivered packet#: "+dPacket.GetSe
         //create all packets needed
         PacketFactory pFactory = new PacketFactory(totalNumberOfPackets,PACKETSIZE, INPUTBUFFERS );
         //create packet consumption object
-        PacketConsumption pConsumer = new PacketConsumption(cfg, OUTPUTBUFFERS);
+        PacketConsumption pConsumer = new PacketConsumption(cfg, OUTPUTBUFFERS, SEED);
         
         //attempt to capture each bus for input packets
         for(int x=0; x<sFabric.GetVerticalBuses(); x++)
@@ -602,7 +602,7 @@ else if(inputType == 1)
             {
 //**************************************************
 //NEED TO CONSUME ACCORDING TO DISTRIBUTION
-pConsumer.ConsumePackets(TIME, outputBuffer, SEED, readyQueue,PULSE, current);
+pConsumer.ConsumePackets(TIME, outputBuffer, readyQueue,PULSE, current);
 //**************************************************
 /*
                 //update the next Consumption Bus event time

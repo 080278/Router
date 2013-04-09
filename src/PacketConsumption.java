@@ -6,7 +6,10 @@ import java.net.InetAddress;
  */
 public class PacketConsumption
 {
-
+    //hold the seed of the simulation
+    long SEED;
+    //uniform random selection of outputBuffer
+    Random rnd;
     //holds the configuration file
     private ConfigFile cfg;
     //holds the number of output buffers
@@ -16,37 +19,39 @@ public class PacketConsumption
     //holds the distribution type
     private Distribution dType;
     
-    public PacketConsumption(ConfigFile cfg, int OUTPUTBUFFERS)
+    public PacketConsumption(ConfigFile cfg, int OUTPUTBUFFERS, long SEED)
     {
-        
+        //set the seed
+        this.SEED = SEED;
         //set the configuration file
         this.cfg = cfg;
         //set the output buffers
         this.OUTPUTBUFFERS = OUTPUTBUFFERS;
         //create timing listing
         timing = new Queue[OUTPUTBUFFERS];
+        //innitialize random selection of outputBuffer
+        rnd = new Random(this.SEED);
     }
     
     
 //*****************************************************************************    
     //remove packets from simulation output buffer
-    public void ConsumePackets(int TIME, Queue<RouterPacket> []outputBuffer, long SEED, PriorityQueue<Event> pQ,int PULSE, Event current)
+    public void ConsumePackets(int TIME, Queue<RouterPacket> []outputBuffer, PriorityQueue<Event> pQ,int PULSE, Event current)
     {
         //temporary hold the queue from distribution calculations
         Queue tmp = null;
       
         //holds the buffer to remove the packets from        
         int bufferNumber = -1;
-        //uniform random selection of outputBuffer
-        Random rnd = new Random(SEED);
+        
         
         //output buffer number selection
         bufferNumber = rnd.nextInt(outputBuffer.length);
 //******************************************************
 //              DISTRIBUTION
 
-        double discard = 0;
-        //int discard = 0;
+        //double discard = 0;
+        int discard = 0;
                 
         //holds the number of packet found in the buffer
         int NumberOfPackets = outputBuffer[bufferNumber].size();
@@ -89,6 +94,7 @@ public class PacketConsumption
             {
                 //create class, set the number of time the packets are broken up
                 dType = new UniformDistribution(mean, stdDev);
+                
             }
             //check if OUTPUT-DISTRIBUTION = Normal
             else if(((String)cfg.GetConfig("CONSUMPTION-DISTRIBUTION","Type")).
@@ -141,12 +147,14 @@ public class PacketConsumption
                 }
 
                 //plus tick to discard the packet from the buffer
-                discard = Double.parseDouble(timing[bufferNumber].remove().toString());
+                //discard = Double.parseDouble(timing[bufferNumber].remove().toString());
+                discard = (int)timing[bufferNumber].remove();
 //discard = (int)timing[bufferNumber].remove();
                 try
                 {
                     //add 1 Discard Packet events to the simulator
-                    Event evt = new Event(TIME +(int)discard+PULSE, "DiscardPacket");
+                    //Event evt = new Event(TIME +(int)discard+PULSE, "DiscardPacket");
+                    Event evt = new Event(TIME +(int)discard, "DiscardPacket");
                     //get how many packets to discard
                     int numberOfPacketsToDiscard = (Integer)cfg.GetConfig("CLASSCONSUMPTIONRATES",
                         (String)cfg.GetConfig("OUTPUTBUFFERSCLASS", ("buffer"+(bufferNumber+1)) ));

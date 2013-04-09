@@ -166,7 +166,7 @@ public class ExponentialDistribution extends Distribution
     {
         
         
-        int NumberOfPackets = 5 ;
+        int NumberOfPackets = 15 ;
         //*************************
         double mean = 10;//2.9;
         //*************************

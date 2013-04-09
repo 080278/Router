@@ -8,20 +8,23 @@ public class UniformDistribution extends Distribution
     //number of packets
     private int NumberOfPackets;
 //******************************************    
-
+    //create random object
+   Random rand = new Random();
+    
     private Queue q;
 //******************************************
     
-    //create random object
-    Random rand = new Random();
-    
+       
     //create normal distribution array
-   int[] UDarray; // = new int[1000];
+    //int[] 
+           
+    ArrayList UDarray; // = new int[1000];
     
    
    //Uniform Distribution class constructor
     public  UniformDistribution(double mean,double standardDeviation)
     {
+        //super(mean, standardDeviation,inputbuffersize);
         super(mean, standardDeviation);
         //initialize the queue for output
         q=new LinkedList();
@@ -31,24 +34,31 @@ public class UniformDistribution extends Distribution
         //getDistribution();
     }
     
-    //return the Queue holding the distribution
-        public Queue GetDistributionQueue()
-        {
-            return q;
-        }
+    
         
     
         @Override
         //public int getDistribution(double standardDeviation) 
         public int getDistribution() 
         {
-            double value  = -1;
+            //keeps track of packets created
+            int PacketCounter = 0;
             
-            value = ((Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation));
+            int[] a =new int[inputbuffersize];
             
-            q.add(value);
-                
-            System.out.println(value);
+            int val;
+            
+            while (PacketCounter < NumberOfPackets)
+            { 
+                val = (int)((Math.log(1 / (1 - rand.nextDouble())) + mean) * Math.sqrt(standardDeviation));
+                    //add each value to the distribution array
+                    q.add(val);
+                PacketCounter +=1;
+                System.out.print((int)val+ " ");
+            }
+ 
+                System.out.println();
+            //System.out.println((int)val);
             return -1;
         } 
         
@@ -57,12 +67,18 @@ public class UniformDistribution extends Distribution
         public void SetNumebrOfPackets(int packets)
         {
             NumberOfPackets = packets;
-            UDarray = new int[NumberOfPackets];
+            //UDarray = new int[NumberOfPackets];
+        }
+        
+        //return the Queue holding the distribution
+        public Queue GetDistributionQueue()
+        {
+            return q;
         }
         
         public int getNumber()
         {
-            int value=0;
+            int value=-1;
             if (q.size() > 0)
             {
                 value = (Integer)q.remove();
@@ -101,8 +117,10 @@ public class UniformDistribution extends Distribution
        
     public static void main(String[] args)
     {
+        
+        
         //int NumberOfTimesPacketsAreDeliverd = 0;
-        int NumberOfPackets = 100;
+        int NumberOfPackets = 10;
         //*************************
         double mean = 4.5;//2.9;
         double StandardDeviation = 1.5;
@@ -115,5 +133,6 @@ public class UniformDistribution extends Distribution
             //**********************************
             distribution.SetNumebrOfPackets(NumberOfPackets);
             distribution.getDistribution();
+        
     }
 }

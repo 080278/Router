@@ -45,6 +45,7 @@ public class NormalDistribution extends Distribution
         {
             int val = (int) (mean + standardDeviation * rand.nextGaussian());
             
+            
             q.add(val);
             
             System.out.println(val);
