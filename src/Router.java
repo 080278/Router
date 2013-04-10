@@ -7,6 +7,8 @@ import java.net.*;
 
 public class Router {
 
+    //export data results
+    ExportFile exp;
     //holds the distribution type
     private Distribution dType;
     //holds the clock time
@@ -164,6 +166,10 @@ public class Router {
                 outAvgPkts[x] = 0;
                 outDroppedPkts[x] = 0;
         }
+        //initialize export file
+        exp = new ExportFile();
+        //write file header
+        exp.WriteText("Time,Packets");
         
         //calls the method to configure the simulator
         CofigureSimulator();
@@ -753,6 +759,8 @@ if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0
                 //"   Created: "+sFabric.GetRecentPacket().GetTimeCreated()+
                 //"   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+
                 "    PKT(S)-Moved:"+NumberOfPacketsMoved); 
+            
+            exp.WriteText(TIME + ","+NumberOfPacketsMoved);
         }
     }
 }
@@ -992,7 +1000,8 @@ System.out.println("Time: "+ TIME +" SetINACTIVE FROM: "+current.GetInputBuffer(
             System.out.println("Output  Buffer["+(x+1)+"] Average Number of pkt(s)   = "+outAvgPkts[x]);
             System.out.println("Output  Buffer["+(x+1)+"] Dropped pkt(s)             = "+outDroppedPkts[x]);
         }
-        
+        //close the output results
+        exp.Close();
     }
     
     public static void main(String[] args) {
