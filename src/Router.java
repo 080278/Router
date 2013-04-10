@@ -742,8 +742,17 @@ System.out.println("    Input["+(current.GetInputBuffer())+"]" +" = "
         +inputBuffer[current.GetInputBuffer()].size()+"    --> Output["
         +(current.GetOutputBuffer())+"]" + " = "
         + outputBuffer[current.GetOutputBuffer()].size());                    
-                    */
-
+         
+         */
+                        
+        //check packet was successfully moved
+        if (sFabric.GetPacketMoved())
+        {
+            if(sFabric.GetCurrentPacketUsingTheBus(current.GetBus()) != -1)
+            {
+                exp.WriteText(TIME + ","+NumberOfPacketsMoved);
+            }
+        }
 if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
 {       
     //check packet was successfully moved
@@ -760,7 +769,7 @@ if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0
                 //"   Delivered: "+sFabric.GetRecentPacket().GetTimeDeliverd()+
                 "    PKT(S)-Moved:"+NumberOfPacketsMoved); 
             
-            exp.WriteText(TIME + ","+NumberOfPacketsMoved);
+            
         }
     }
 }
@@ -882,6 +891,8 @@ System.out.println("\nTime: "+ TIME + "    --> Output["+(current.GetOutputBuffer
                         outAvgPkts[current.GetOutputBuffer()] += outputBuffer[current.GetOutputBuffer()].size();
                         outAvgPkts[current.GetOutputBuffer()] /=2;
 
+                        exp.WriteText(TIME + ","+NumberOfPacketsMoved);
+                        
                         if(((String)cfg.GetConfig("GENERAL","Verbose")).compareToIgnoreCase("True") == 0)
                         {                    
                             System.out.println("Time: "+ TIME + "    <PACKET ARRIVED AT OUTPUT FROM><***   INTERNAL MEMORY   ***>    Packet: "+
